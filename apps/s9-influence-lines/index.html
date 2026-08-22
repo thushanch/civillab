@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Influence Lines</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Influence Lines</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Influence Lines controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 620" role="img" aria-label="Beam with a moving unit load and the influence line building below"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>An influence line shows one response at one fixed place as a unit load moves across the beam.</li>
+          <li>The load moves; the section does not. That distinction is the whole idea.</li>
+          <li>The influence line for shear at a section jumps by 1 as the load crosses the section.</li>
+          <li>The peak ordinate of the moment influence line at section c is c(L−c)/L for a simple span.</li>
+          <li>Overhangs create negative regions: load there to relieve the response, not increase it.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+  <footer>
+    <span class="note">CivilLab · Structural Engineering · CE2013 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/beam-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

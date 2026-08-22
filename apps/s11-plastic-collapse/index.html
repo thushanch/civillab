@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Plastic Collapse Mechanisms</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Plastic Collapse Mechanisms</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Plastic Collapse Mechanisms controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 520" role="img" aria-label="Collapse mechanism with plastic hinges and the work equation"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>A plastic hinge forms where the moment reaches Mp; the section then rotates at constant moment.</li>
+          <li>Collapse needs enough hinges to turn the structure into a mechanism, so redundancy plus one.</li>
+          <li>The load factor comes from equating external work to internal work at the hinges.</li>
+          <li>A fixed ended beam carries twice the central point load of a simply supported one, 8Mp/L against 4Mp/L.</li>
+          <li>For a frame, several mechanisms are possible and the lowest load factor governs.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+  <footer>
+    <span class="note">CivilLab · Structural Engineering · CE2113 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/phase3-engines.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Mohr's Circle for Stress</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Mohr's Circle for Stress</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Stress state controls">
+      <h3>Stress state</h3>
+      <div class="ctl"><label for="sx-n">σx, normal stress (MPa)</label>
+        <div class="row">
+          <input type="range" id="sx-r" data-k="sx" min="-200" max="200" step="5" value="80">
+          <input type="number" id="sx-n" data-k="sx" min="-200" max="200" step="5" value="80">
+        </div>
+      </div>
+      <div class="ctl"><label for="sy-n">σy, normal stress (MPa)</label>
+        <div class="row">
+          <input type="range" id="sy-r" data-k="sy" min="-200" max="200" step="5" value="20">
+          <input type="number" id="sy-n" data-k="sy" min="-200" max="200" step="5" value="20">
+        </div>
+      </div>
+      <div class="ctl"><label for="txy-n">τxy, shear stress (MPa)</label>
+        <div class="row">
+          <input type="range" id="txy-r" data-k="txy" min="-200" max="200" step="5" value="40">
+          <input type="number" id="txy-n" data-k="txy" min="-200" max="200" step="5" value="40">
+        </div>
+      </div>
+
+      <h3>Cutting plane</h3>
+      <div class="ctl"><label for="th-n">Rotation θ (degrees, + anticlockwise)</label>
+        <div class="row">
+          <input type="range" id="th-r" data-k="th" min="-90" max="90" step="0.5" value="0">
+          <input type="number" id="th-n" data-k="th" min="-90" max="90" step="0.5" value="0">
+        </div>
+      </div>
+      <div class="addrow">
+        <button class="btn small" id="sweep">Sweep θ</button>
+        <button class="btn ghost small" id="zero">θ = 0</button>
+      </div>
+
+      <h3>Presets</h3>
+      <div class="ctl">
+        <select id="preset">
+          <option value="general" selected>General plane stress</option>
+          <option value="uni">Uniaxial tension</option>
+          <option value="shear">Pure shear</option>
+          <option value="biax">Biaxial, opposite signs</option>
+          <option value="hydro">Equal biaxial (hydrostatic)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+    </aside>
+
+    <div>
+      <div class="mohrgrid">
+        <div class="figwrap">
+          <svg id="el" viewBox="0 0 420 400" role="img"
+               aria-label="Stress element rotated by theta with transformed stresses"></svg>
+        </div>
+        <div class="figwrap">
+          <svg id="circ" viewBox="0 0 520 420" role="img"
+               aria-label="Mohr's circle with principal stresses and the current plane"></svg>
+        </div>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Every point on the circle is the same physical stress state, viewed on a different cutting plane.</li>
+          <li>Rotate the element by θ and the stress point travels 2θ around the circle in the same sense, because τ is plotted positive downwards.</li>
+          <li>The circle crosses the σ axis at the principal stresses σ₁ and σ₂, where the shear stress vanishes.</li>
+          <li>The radius equals the maximum in-plane shear stress, found on planes 45° from the principal planes.</li>
+          <li>Press Sweep θ and watch the element and the circle move together.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Structural Engineering · CE2013 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/mohr-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

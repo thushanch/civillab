@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Bending Stress Explorer</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Bending Stress Explorer</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Bending Stress Explorer controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 520" role="img" aria-label="Cross section with neutral axis and the linear bending stress distribution"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Bending stress varies linearly with distance from the neutral axis, which passes through the centroid.</li>
+          <li>The section modulus Z = I/y tells you the moment a section can carry per unit of allowable stress.</li>
+          <li>For unsymmetric sections like a tee, the top and bottom fibre stresses differ because ytop and ybot differ.</li>
+          <li>Sagging moment puts the top in compression and the bottom in tension.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+  <footer>
+    <span class="note">CivilLab · Structural Engineering · CE1112 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/section-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

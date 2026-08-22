@@ -1,0 +1,11 @@
+# working files, not part of the suite
+_preview_*.html
+node_modules/
+package-lock.json
+package.json
+
+# OS and editor noise
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp

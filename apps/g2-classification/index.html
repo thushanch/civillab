@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Particle Size &amp; Soil Classification</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Particle Size &amp; Soil Classification</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Sieve sample and Atterberg limit controls"></aside>
+    <div>
+      <div class="mohrgrid">
+        <div class="figwrap">
+          <svg id="grade" viewBox="0 0 480 430" role="img"
+               aria-label="Semi-logarithmic grading curve with draggable sieve points and the D10, D30 and D60 read-offs"></svg>
+        </div>
+        <div class="figwrap">
+          <svg id="plast" viewBox="0 0 540 430" role="img"
+               aria-label="Casagrande plasticity chart with the A line, the U line and the draggable sample point"></svg>
+        </div>
+      </div>
+      <div id="tablewrap" class="panel" style="margin-top:14px;overflow-x:auto"></div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>The grading curve is read at 10, 30 and 60 percent passing. Those three sizes give Cu and Cc, which say how wide the range of sizes is and how smoothly it is filled.</li>
+          <li>A steep curve holds one size, so Cu is small and the soil is poorly graded. A flat curve covers many sizes, so the small grains fill the gaps between the large ones and the soil packs tighter.</li>
+          <li>Once more than 10 percent passes the 75 micron sieve, D10 lies below the finest sieve. Cu and Cc can no longer be read from sieving and a hydrometer test is needed.</li>
+          <li>The plasticity chart only matters when there are enough fines. Under 5 percent it is ignored, between 5 and 12 percent it adds a second symbol, and above 50 percent it decides the whole name.</li>
+          <li>The A line separates clay from silt at the same liquid limit. Above it the fines are clays, below it they are silts. Nothing should plot above the U line.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Geotechnical Engineering · CE2042 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/soil-class-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

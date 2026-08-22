@@ -1,0 +1,168 @@
+/* ============================================================
+   CivilLab · shared design system
+   Brand: Thushan Chamika (see 01_Brand_Guide.md)
+   Blue leads, hairline borders, no drop shadows, generous space.
+   Fonts: Poppins (headings) + Inter (body), self hosted as woff2 in
+   assets/fonts so the suite is fully offline. Latin and Greek subsets
+   are bundled, which covers the sigma, tau, theta and lambda labels.
+   Both faces are SIL Open Font License 1.1, see assets/fonts/OFL.txt.
+   ============================================================ */
+/* self hosted faces, no network needed */
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url(../fonts/Inter-greek-ext.woff2) format('woff2');unicode-range:U+1F00-1FFF;}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url(../fonts/Inter-greek.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url(../fonts/Inter-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url(../fonts/Inter-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/Poppins-latin-ext-500.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/Poppins-latin-ext-600.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/Poppins-latin-500.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/Poppins-latin-600.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+
+:root{
+  --ocean:#14416B;      /* primary */
+  --water:#1E78B0;      /* secondary, water accents */
+  --green:#2E6B4F;      /* secondary, safe / response */
+  --bg:#F6F7F4;         /* off-white background */
+  --ink:#1C2A33;        /* body text */
+  --midblue:#2E6FA3;    /* support tint, art only */
+  --pale:#9FC4E6;       /* support tint, art only */
+  --contour:#C9CEC7;    /* contour grey */
+  --hair:#DFE3DC;       /* hairline borders */
+  --panel:#FFFFFF;
+  --load:#B03A2E;       /* functional colour: applied loads, fail states */
+  --muted:#5C6A72;
+  --radius:10px;
+  --font-head:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);
+     font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--font-head);color:var(--ocean);font-weight:600;line-height:1.2;margin:0}
+a{color:var(--water);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+img{max-width:100%}
+
+.shell{max-width:1180px;margin:0 auto;padding:20px 24px 44px}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;gap:14px;padding:4px 0 14px}
+.top img.mark{height:42px;width:auto}
+.top .titles{display:flex;flex-direction:column}
+.top .suite{font-family:var(--font-head);font-weight:600;color:var(--ocean);
+            font-size:13px;letter-spacing:.04em}
+.top .suite span{color:var(--water);font-weight:500}
+.top h1{font-size:22px;margin-top:1px}
+.top .back{margin-left:auto;font-size:13px;font-weight:500;white-space:nowrap}
+
+/* the single motif per page: one topographic contour line */
+.contour{display:block;width:100%;height:24px;margin:0 0 18px}
+
+/* ---------- workbench ---------- */
+.workbench{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);padding:16px}
+.panel h3{font-size:12px;letter-spacing:.07em;text-transform:uppercase;
+          color:var(--ocean);margin:14px 0 8px}
+.panel h3:first-child{margin-top:0}
+
+.figwrap{background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);
+         padding:8px 8px 2px}
+.figwrap svg{display:block;width:100%;height:auto;touch-action:none;user-select:none}
+svg text{font-family:var(--font-body)}
+[data-id]{cursor:grab}
+
+/* ---------- controls ---------- */
+.ctl{margin:9px 0}
+.ctl>label{display:block;font-size:13px;font-weight:500;margin-bottom:4px}
+.ctl .row{display:flex;gap:8px;align-items:center}
+input[type=range]{flex:1;accent-color:var(--water);min-width:0}
+input[type=number]{font:inherit;font-size:13px;padding:5px 7px;border:1px solid var(--hair);
+                   border-radius:6px;background:#fff;color:var(--ink);width:76px}
+select{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--hair);
+       border-radius:6px;background:#fff;color:var(--ink);width:100%}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:500;cursor:pointer}
+.chk input{accent-color:var(--water);margin-top:2px}
+
+.btn{font-family:var(--font-head);font-weight:500;font-size:13px;border:1px solid var(--ocean);
+     background:var(--ocean);color:#fff;border-radius:7px;padding:7px 12px;cursor:pointer}
+.btn:hover{background:#0F3355}
+.btn.ghost{background:transparent;color:var(--ocean)}
+.btn.ghost:hover{background:rgba(20,65,107,.06)}
+.btn.small{padding:4px 10px;font-size:12px}
+.addrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+/* load cards */
+.loadcard{border:1px solid var(--hair);border-radius:8px;padding:9px 10px;margin:8px 0;background:#FBFCFA}
+.loadcard .head{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.badge{font-family:var(--font-head);font-size:10.5px;font-weight:600;letter-spacing:.05em;
+       padding:2px 8px;border-radius:5px;color:#fff;text-transform:uppercase}
+.badge.point{background:var(--load)}
+.badge.udl{background:var(--midblue)}
+.badge.moment{background:var(--green)}
+.del{margin-left:auto;border:1px solid var(--hair);background:#fff;color:var(--muted);
+     border-radius:6px;width:22px;height:22px;line-height:1;cursor:pointer;font-size:12px;padding:0}
+.del:hover{color:var(--load);border-color:var(--load)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.mini label{font-size:11px;color:var(--muted);display:block;margin-bottom:2px}
+.mini input{width:100%}
+
+/* ---------- results chips ---------- */
+.results{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.chip{background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);
+      padding:8px 14px;min-width:118px}
+.chip .k{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.chip .v{font-family:var(--font-head);font-weight:600;font-size:18px;color:var(--ocean);margin-top:1px}
+.chip .s{font-size:11px;color:var(--muted)}
+.chip.ok .v{color:var(--green)}
+.chip.warn .v{color:var(--load)}
+
+/* learn box */
+details.learn{margin-top:14px;border:1px solid var(--hair);border-radius:var(--radius);
+              background:var(--panel);padding:10px 14px}
+details.learn summary{font-family:var(--font-head);font-weight:600;color:var(--ocean);
+                      cursor:pointer;font-size:13px}
+details.learn ul{margin:8px 0 4px;padding-left:18px;font-size:13.5px}
+details.learn li{margin:4px 0}
+
+/* ---------- footer ---------- */
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--hair);
+       display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer .note{font-size:12px;color:var(--muted)}
+footer img{height:24px;width:auto;opacity:.92}
+
+/* ---------- landing page ---------- */
+.hero{padding:22px 0 4px}
+.hero h1{font-size:40px;letter-spacing:-.01em}
+.hero p.lede{max-width:660px;font-size:16px;margin:10px 0 0}
+.hero .by{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px;color:var(--muted)}
+.hero .by img{height:28px;width:auto}
+h2.sec{font-size:16px;margin:28px 0 12px;letter-spacing:.02em}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--hair);border-radius:var(--radius);
+      padding:16px;display:flex;flex-direction:column;gap:8px}
+.card .disc{font-family:var(--font-head);font-size:10.5px;letter-spacing:.07em;
+            text-transform:uppercase;color:var(--water);font-weight:600}
+.card h3{font-size:17px}
+.card p{margin:0;font-size:13.5px;color:#41505A;flex:1}
+.card .btn{align-self:flex-start;margin-top:4px}
+.pgroup{margin:12px 0}
+.pgroup .gname{font-family:var(--font-head);font-size:12.5px;font-weight:600;
+               color:var(--ocean);margin-bottom:6px}
+.pchips{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{font-size:12px;border:1px solid var(--hair);border-radius:999px;
+       padding:3px 11px;background:#fff;color:#41505A}
+
+/* Mohr app layout */
+.mohrgrid{display:grid;grid-template-columns:5fr 6fr;gap:14px}
+
+@media (max-width:900px){
+  .workbench{grid-template-columns:1fr}
+  .mohrgrid{grid-template-columns:1fr}
+  .top h1{font-size:18px}
+  .hero h1{font-size:30px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
