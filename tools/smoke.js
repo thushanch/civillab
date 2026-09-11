@@ -36,9 +36,16 @@ function checkApp(app) {
   const svgs = [...doc.querySelectorAll('.figwrap svg')];
   const chips = doc.querySelectorAll('.chip');
   let pass = 0, fail = 0;
-  const ok = (n, g, e) => {
-    if (String(g) === String(e)) { pass++; console.log('    ok   ' + n + ' = ' + g); }
-    else { fail++; console.log('    FAIL ' + n + ' got ' + g + ' expected ' + e); }
+  // ok(name, got, expected [, tol]).  Pass a tolerance and the comparison is
+  // numeric, leave it out and it is an exact string match.
+  const ok = (n, g, e, tol) => {
+    const good = tol == null
+      ? String(g) === String(e)
+      : (typeof e === 'number' && isFinite(e) &&
+         isFinite(parseFloat(g)) && Math.abs(parseFloat(g) - e) <= tol);
+    if (good) { pass++; console.log('    ok   ' + n + ' = ' + g); }
+    else { fail++; console.log('    FAIL ' + n + ' got ' + g + ' expected ' + e +
+      (tol == null ? '' : ' +/- ' + tol)); }
   };
 
   console.log('\n' + app);

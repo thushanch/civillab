@@ -14,7 +14,7 @@ subsets are included, which covers the sigma, tau, theta and lambda labels
 the figures use. Both faces are SIL Open Font License 1.1, see
 `assets/fonts/OFL.txt`.
 
-## Live apps (v0.6: 16 apps)
+## Live apps (v0.7: 17 apps)
 
 1. **Beam SFD & BMD Studio** (`apps/s1-beam-studio/`)
    Simply supported, overhanging and cantilever beams with draggable point
@@ -74,6 +74,16 @@ the figures use. Both faces are SIL Open Font License 1.1, see
    New engine: `seepage-engine.js`, verified by 38 checks including an exact
    linear field, exact proportionality to k and H, flow conservation, symmetry
    and grid convergence.
+
+8. **Consolidation over Time** (`apps/g5-consolidation/`)
+   The Terzaghi series solved directly, so the isochrones are the real thing
+   rather than a sketch. Press play and the excess pore pressure collapses
+   while the settlement curve fills in against log time, with t50 and t90
+   marked and the marker draggable. Compression index or mv, normally or
+   overconsolidated, one or two way drainage, and secondary creep past t90.
+   New engine: `consol-engine.js`, verified by 80 checks including T50 = 0.197,
+   T90 = 0.848, the two textbook approximations, and single drainage taking
+   exactly four times as long as double.
 
 ## Structure
 

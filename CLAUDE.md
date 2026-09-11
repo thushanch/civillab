@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-16 of 37 apps are live. Your job is to build the next app to exactly the
+17 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 16 live cards + pipeline chips
+├── index.html                  landing page, 17 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -69,13 +69,14 @@ civillab/
 │       ├── phase3-engines.js   PlasticEngine, DynEngine
 │       ├── soil-class-engine.js  SoilClassEngine.grading/atterberg/classify
 │       ├── shear-engine.js     ShearEngine.solve, Mohr-Coulomb failure
-│       └── seepage-engine.js   SeepageEngine.solve, Laplace flow net
+│       ├── seepage-engine.js   SeepageEngine.solve, Laplace flow net
+│       └── consol-engine.js    ConsolEngine.solve, Terzaghi consolidation
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
     s9-influence-lines  s10-moment-distribution
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
-    g3-shear-strength  g4-flow-nets
+    g3-shear-strength  g4-flow-nets  g5-consolidation
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -323,6 +324,16 @@ SeepageEngine.solve({ kind:'sheetpile'|'dam', W, D, d, B, H, k, nx, ny })
   //     conservation, headAt(x,z), equipotentials(Nd), flowlines(Nf) }
 SeepageEngine.criticalGradient(Gs, e)   // (Gs − 1)/(1 + e)
 SeepageEngine.laplace(nx, ny, dx, dz, type, val, opts)  // general FD solver
+
+// consol-engine.js  — metres, kPa, cv in m2/s, time in seconds
+ConsolEngine.solve({ H, cv, ds, drainage:'one'|'two', method:'cc'|'mv',
+  Cc, Cs, e0, s0, sp, mv, Ca, t })
+  // → { T, U, Sc, St, Ss, Stotal, Hdr, twoWay, legs[], overconsolidated,
+  //     t50, t90, isochrone(n), uAtDepth(zFrac), curve(n) }
+ConsolEngine.Uavg(T)        // 1 - sum (2/M^2) exp(-M^2 T)
+ConsolEngine.Tv(U)          // inverted from the series, T50 = 0.197
+ConsolEngine.TvApprox(U)    // pi/4 U^2 below 60 %, log form above
+ConsolEngine.uRatio(Z, T)   // u/u0, Z = z/Hdr
 ```
 
 ### Writing a new engine
@@ -342,7 +353,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -358,6 +369,10 @@ Seepage: the FD Laplace solver reproduces an exact linear field to 1e-7, q is
 exactly proportional to k and to H, inflow equals outflow, h(x) + h(W−x) = H
 about a centred pile, the ψ range reproduces q, and i_c = (Gs−1)/(1+e) = 1.0
 at Gs 2.65 with e 0.65.
+Consolidation: T50 = 0.197 and T90 = 0.848 from the series, matching pi/4 U^2
+below 60 per cent and 1.781 - 0.933 log(100 - U) above it to within 2 per cent,
+u = 0 at every drained face with a zero gradient at an impermeable one, and
+single drainage taking exactly four times as long as double.
 
 For engines still to be written:
 Tv = 0.197 at U = 50% and 0.848 at U = 90%; Ka = tan²(45 − φ/2) and
@@ -491,15 +506,13 @@ nothing.
 
 ---
 
-## 9. Remaining 21 apps
+## 9. Remaining 20 apps
 
 Build order: geotechnical, then foundations, then design modules, then
 transport and environmental. Full prose specs are in `PLAN.md`.
 
-**Geotechnical (2)**
+**Geotechnical (1)**
 
-- `g5-consolidation` CE2132. H, cv, Δσ, one or two way drainage. Settlement
-  against time with a moving marker and animated pore pressure isochrones.
 - `g6-slope-stability` CE3132. Draggable slip circle, method of slices,
   one slice's force polygon, FoS updating live.
 
@@ -590,7 +603,7 @@ software.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "16 live · 21 in the pipeline". Keep cards in build order.
+line, currently "17 live · 20 in the pipeline". Keep cards in build order.
 
 ---
 
