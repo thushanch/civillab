@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-15 of 34 apps are live. Your job is to build the next app to exactly the
+15 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -53,7 +53,7 @@ Definition of done for a new app:
 civillab/
 ├── index.html                  landing page, 15 live cards + pipeline chips
 ├── README.md
-├── PLAN.md                     full prose roadmap for all 34 apps
+├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
 │   ├── css/civillab.css        the ONLY stylesheet, all shared classes
 │   ├── img/                    markB.png, wm_horizontal_dark.png, _white.png
@@ -467,7 +467,7 @@ nothing.
 
 ---
 
-## 9. Remaining 19 apps
+## 9. Remaining 22 apps
 
 Build order: geotechnical, then foundations, then design modules, then
 transport and environmental. Full prose specs are in `PLAN.md`.
@@ -489,32 +489,62 @@ transport and environmental. Full prose specs are in `PLAN.md`.
 - `f2-bearing-capacity` CE4032. Terzaghi or EC7 factors, B, D, water table,
   eccentricity. Failure wedge, pressure bulb, qu against applied.
 
-**Concrete (4)**
+**Design apps, shared rules (PLAN.md has the full briefs)**
 
-- `c1-rc-beam` CE2122. **Reuses SectionEngine.** EC2 rectangular stress
-  block, under and over reinforced state, MRd against MEd.
-- `c2-rc-column` CE2122. Strain compatibility sweep of the NA depth to
-  trace the N-M interaction diagram, draggable design point.
-- `c3-mix-design` CE1132. Target strength, w/c, grading, workability.
-  Proportions bar and strength against w/c curve. Document the method used.
-- `c4-prestressed` CE4012. **Reuses SectionEngine.** Transfer and service
-  fibre stresses side by side, Magnel diagram, loss breakdown.
+Every design app carries a **code toggle, Eurocode with the UK NA against the
+BS it replaced**, shows each design strength as a **visible chain of
+multipliers** ending in the design value, gives **one utilisation bar per
+check with the governing one highlighted**, leads with the verdict and hides
+the substitution in an expandable trail, and prints a **clause reference**
+beside every result. Footer must say these teach the checks and are not design
+software.
 
-**Steel (2)**
+**Actions (1)**
 
-- `st1-member-capacity` CE2022. Small embedded UB/UC table, EC3 section
-  class, Nt,Rd, Nb,Rd, Mc,Rd, utilisation bars. **Build the reusable
-  utilisation-bar component here**, then reuse it in c1, c2, c4, st2, t1,
-  m1, f1, f2, tr3.
-- `st2-connections` CE2022. Bolt group or weld to scale, EC3 shear, bearing
-  and weld resistance, governing check.
+- `d1-actions` EN 1990 + EN 1991 against BS 6399. Permanent, imposed, wind and
+  snow to design actions. 6.10 beside 6.10a/b, the psi factors, and the three
+  SLS combinations from the same inputs. **Build this first**, the other design
+  apps read their actions from it.
+
+**Concrete (6)** EN 1992-1-1 against BS 8110
+
+- `c1-rc-beam` CE2122. **Reuses SectionEngine.** Tabs for flexure, shear,
+  deflection and cracking. Stress block to scale, singly, doubly and flanged.
+  Variable strut angle 21.8 to 45 degrees, VRd,c and VRd,max, link spacing.
+- `c2-rc-column` CE2122. Strain compatibility sweep of the NA depth for the
+  N-M diagram, draggable design point, short against slender with the nominal
+  curvature moment, biaxial contours.
+- `c3-rc-slab` CE2122. One way and two way panels, moment coefficients on each
+  strip, punching shear with the control perimeters drawn at 2d.
+- `c4-detailing` CE2122. Anchorage and lap lengths with the alpha1 to alpha5
+  chain, cover from exposure class and fire period, bar spacing against the
+  available width.
+- `c5-mix-design` CE1132. Target strength, w/c, grading, workability.
+  Document the method used.
+- `c6-prestressed` CE4012. **Reuses SectionEngine.** Transfer and service
+  fibre stresses side by side, Magnel diagram, losses as a waterfall.
+
+**Steel (2)** EN 1993-1-1 against BS 5950
+
+- `st1-member-capacity` CE2022. Embedded UB, UC and hollow section table.
+  Tabs for classification with c/t measured on the drawn section, tension,
+  compression on the right buckling curve, bending with lateral torsional
+  buckling and restraint positions, and the combined interaction.
+  **Build the reusable utilisation-bar component here**, then reuse it in
+  c1, c2, c4, c6, st2, t1, m1, f1, f2, tr3.
+- `st2-connections` CE2022. Tabs for the bolt group, welds and the base plate.
+  Bolt shear, bearing on both plies, tension with prying, block tear drawn on
+  the plate, fillet welds by the directional method, base plate effective area.
 
 **Timber and masonry (2)**
 
-- `t1-timber` CE3122. EC5 kmod chain shown as visible multipliers ending
-  in fd, stress against capacity bars.
-- `m1-masonry` CE3122. EC6 slenderness reduction Φ, eccentricity, vertical
-  and lateral capacity, arching sketch.
+- `t1-timber` CE3122. EN 1995-1-1 against BS 5268. kmod and gammaM chain to fd,
+  with kh, kcrit and ksys when they apply, then bending both axes, shear,
+  compression parallel and perpendicular, and buckling with kc.
+- `m1-masonry` CE3122. EN 1996-1-1 against BS 5628. Effective height and
+  thickness, slenderness and eccentricity to the reduction factor Phi, vertical
+  resistance, then a lateral tab with orthogonal ratio and arching.
+
 
 **Transportation (3)**
 
@@ -538,7 +568,7 @@ transport and environmental. Full prose specs are in `PLAN.md`.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "15 live · 19 in the pipeline". Keep cards in build order.
+line, currently "15 live · 22 in the pipeline". Keep cards in build order.
 
 ---
 
