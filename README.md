@@ -14,7 +14,7 @@ subsets are included, which covers the sigma, tau, theta and lambda labels
 the figures use. Both faces are SIL Open Font License 1.1, see
 `assets/fonts/OFL.txt`.
 
-## Live apps (v0.5: 15 apps)
+## Live apps (v0.6: 16 apps)
 
 1. **Beam SFD & BMD Studio** (`apps/s1-beam-studio/`)
    Simply supported, overhanging and cantilever beams with draggable point
@@ -63,6 +63,17 @@ the figures use. Both faces are SIL Open Font License 1.1, see
    so 100 per cent is exactly where the circle touches the envelope.
    New engine: `shear-engine.js`, verified by 70 checks. It reuses
    `MohrEngine` for the circle geometry rather than repeating it.
+
+7. **Flow Nets & Seepage** (`apps/g4-flow-nets/`)
+   A flow net that is solved rather than sketched. A finite difference Laplace
+   solver gives the head field, a second solve gives the stream function, and
+   marching squares turns both into the flow lines and equipotentials. Drag the
+   cutoff tip and the whole net redraws. Reports the discharge, the true form
+   factor Nf/Nd against the net the student drew, the exit gradient against the
+   critical gradient, and the uplift diagram on a dam base.
+   New engine: `seepage-engine.js`, verified by 38 checks including an exact
+   linear field, exact proportionality to k and H, flow conservation, symmetry
+   and grid convergence.
 
 ## Structure
 

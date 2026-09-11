@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-15 of 37 apps are live. Your job is to build the next app to exactly the
+16 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 15 live cards + pipeline chips
+├── index.html                  landing page, 16 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -68,13 +68,14 @@ civillab/
 │       ├── mdm-engine.js       MDMEngine.create/step/run/results
 │       ├── phase3-engines.js   PlasticEngine, DynEngine
 │       ├── soil-class-engine.js  SoilClassEngine.grading/atterberg/classify
-│       └── shear-engine.js     ShearEngine.solve, Mohr-Coulomb failure
+│       ├── shear-engine.js     ShearEngine.solve, Mohr-Coulomb failure
+│       └── seepage-engine.js   SeepageEngine.solve, Laplace flow net
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
     s9-influence-lines  s10-moment-distribution
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
-    g3-shear-strength
+    g3-shear-strength  g4-flow-nets
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -306,6 +307,22 @@ SoilClassEngine.classify(points, LL, PL)
   //     steps[], notes[], gradationKnown }
 SoilClassEngine.aLine(LL)   // 0.73(LL − 20)
 SoilClassEngine.uLine(LL)   // 0.9(LL − 8)
+
+// shear-engine.js  — kPa, degrees in, radians inside, COMPRESSION POSITIVE
+ShearEngine.solve({ mode:'cd'|'cu'|'uu', c, phi, cu, s3, A, sd })
+  // → { s1, s3e, s1e, u, tot, eff, act, sdf, margin, failed,
+  //     phiMob, atFailure:{ C, R, tangent:{s,t}, theta }, neverFails }
+ShearEngine.Nphi(phiDeg)          // tan^2(45 + phi/2)
+ShearEngine.failureS1(c, phi, s3e)        // s3e Nphi + 2c sqrt(Nphi)
+ShearEngine.failureDeviator(c, phi, s3, A)  // Skempton, B = 1
+
+// seepage-engine.js  — metres, k in m/s, q in m3/s per metre run
+//   h is measured above the downstream ground surface, z up from the base
+SeepageEngine.solve({ kind:'sheetpile'|'dam', W, D, d, B, H, k, nx, ny })
+  // → { h, psi, q, shape (Nf/Nd), iExit, uplift:{pts,force,arm,meanHead},
+  //     conservation, headAt(x,z), equipotentials(Nd), flowlines(Nf) }
+SeepageEngine.criticalGradient(Gs, e)   // (Gs − 1)/(1 + e)
+SeepageEngine.laplace(nx, ny, dx, dz, type, val, opts)  // general FD solver
 ```
 
 ### Writing a new engine
@@ -325,7 +342,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -334,6 +351,13 @@ Classification: A line 21.9 at LL 50 and 58.4 at LL 100, U line 37.8 at
 LL 50, the A line meeting PI = 4 at LL 25.479 and PI = 7 at LL 29.589,
 Cu = D60/D10, Cc = D30²/(D10 D60), and the ASTM D2487 group symbols with
 their 5 and 12 percent fines boundaries.
+Shear strength: Nphi = tan²(45 + φ/2) giving 1, 3 and 5.828 at φ = 0, 30 and
+45, the failure plane at 45 + φ/2, the tangent point at (C − R sinφ, R cosφ),
+and sd = [σ3(N−1) + 2c√N] / (1 + A(N−1)) which gives 2cu when φ = 0.
+Seepage: the FD Laplace solver reproduces an exact linear field to 1e-7, q is
+exactly proportional to k and to H, inflow equals outflow, h(x) + h(W−x) = H
+about a centred pile, the ψ range reproduces q, and i_c = (Gs−1)/(1+e) = 1.0
+at Gs 2.65 with e 0.65.
 
 For engines still to be written:
 Tv = 0.197 at U = 50% and 0.848 at U = 90%; Ka = tan²(45 − φ/2) and
@@ -467,15 +491,13 @@ nothing.
 
 ---
 
-## 9. Remaining 22 apps
+## 9. Remaining 21 apps
 
 Build order: geotechnical, then foundations, then design modules, then
 transport and environmental. Full prose specs are in `PLAN.md`.
 
-**Geotechnical (3)**
+**Geotechnical (2)**
 
-- `g4-flow-nets` CE2132. Sheet pile or dam with cutoff, head difference, k.
-  Flow and equipotential lines, q = k·H·Nf/Nd, uplift and exit gradient.
 - `g5-consolidation` CE2132. H, cv, Δσ, one or two way drainage. Settlement
   against time with a moving marker and animated pore pressure isochrones.
 - `g6-slope-stability` CE3132. Draggable slip circle, method of slices,
@@ -568,7 +590,7 @@ software.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "15 live · 22 in the pipeline". Keep cards in build order.
+line, currently "16 live · 21 in the pipeline". Keep cards in build order.
 
 ---
 
