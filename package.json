@@ -1,0 +1,15 @@
+{
+  "name": "civillab",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Interactive civil engineering simulators. The shipped site has no dependencies, jsdom is only used by the test harness.",
+  "scripts": {
+    "test": "node tools/run-all.js",
+    "syntax": "node tools/run-all.js --syntax",
+    "smoke": "node tools/smoke.js",
+    "offline": "node tools/check-offline.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

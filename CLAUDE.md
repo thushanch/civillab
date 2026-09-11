@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-14 of 34 apps are live. Your job is to build the next app to exactly the
+15 of 34 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 14 live cards + pipeline chips
+├── index.html                  landing page, 15 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 34 apps
 ├── assets/
@@ -67,12 +67,14 @@ civillab/
 │       ├── calc-engines.js     TorsionEngine, ColumnEngine, SoilEngine
 │       ├── mdm-engine.js       MDMEngine.create/step/run/results
 │       ├── phase3-engines.js   PlasticEngine, DynEngine
-│       └── soil-class-engine.js  SoilClassEngine.grading/atterberg/classify
+│       ├── soil-class-engine.js  SoilClassEngine.grading/atterberg/classify
+│       └── shear-engine.js     ShearEngine.solve, Mohr-Coulomb failure
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
     s9-influence-lines  s10-moment-distribution
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
+    g3-shear-strength
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -465,16 +467,13 @@ nothing.
 
 ---
 
-## 9. Remaining 20 apps
+## 9. Remaining 19 apps
 
 Build order: geotechnical, then foundations, then design modules, then
 transport and environmental. Full prose specs are in `PLAN.md`.
 
-**Geotechnical (4)**
+**Geotechnical (3)**
 
-- `g3-shear-strength` CE3132. **Reuses MohrEngine.** c', φ', σ3, u, drained
-  and undrained toggle. Circles against the envelope, failure plane at
-  45 + φ/2, total against effective side by side.
 - `g4-flow-nets` CE2132. Sheet pile or dam with cutoff, head difference, k.
   Flow and equipotential lines, q = k·H·Nf/Nd, uplift and exit gradient.
 - `g5-consolidation` CE2132. H, cv, Δσ, one or two way drainage. Settlement
@@ -539,7 +538,7 @@ transport and environmental. Full prose specs are in `PLAN.md`.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "14 live · 20 in the pipeline". Keep cards in build order.
+line, currently "15 live · 19 in the pipeline". Keep cards in build order.
 
 ---
 

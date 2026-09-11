@@ -14,7 +14,7 @@ subsets are included, which covers the sigma, tau, theta and lambda labels
 the figures use. Both faces are SIL Open Font License 1.1, see
 `assets/fonts/OFL.txt`.
 
-## Live apps (v0.4: 14 apps)
+## Live apps (v0.5: 15 apps)
 
 1. **Beam SFD & BMD Studio** (`apps/s1-beam-studio/`)
    Simply supported, overhanging and cantilever beams with draggable point
@@ -53,6 +53,16 @@ the figures use. Both faces are SIL Open Font License 1.1, see
    The Unified group symbol and full name are worked out and the decision
    trail is written out step by step. New engine: `soil-class-engine.js`,
    verified by 106 checks against ASTM D2487.
+
+6. **Mohr-Coulomb Shear Strength** (`apps/g3-shear-strength/`)
+   A triaxial specimen loaded until it shears along the plane at 45 + phi/2,
+   beside the total and effective Mohr circles running up against the failure
+   envelope. Drained, consolidated undrained and unconsolidated undrained
+   tests, with pore pressure from Skempton A so the two circles pull apart as
+   the load rises. The load slider is a percentage of the deviator at failure,
+   so 100 per cent is exactly where the circle touches the envelope.
+   New engine: `shear-engine.js`, verified by 70 checks. It reuses
+   `MohrEngine` for the circle geometry rather than repeating it.
 
 ## Structure
 

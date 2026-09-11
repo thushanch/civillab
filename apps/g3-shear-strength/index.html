@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Mohr-Coulomb Shear Strength</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Mohr-Coulomb Shear Strength</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Triaxial test controls"></aside>
+    <div>
+      <div class="mohrgrid">
+        <div class="figwrap">
+          <svg id="spec" viewBox="0 0 460 430" role="img"
+               aria-label="Triaxial specimen with the cell pressure, the deviator stress and the failure plane at 45 plus phi over 2"></svg>
+        </div>
+        <div class="figwrap">
+          <svg id="mohr" viewBox="0 0 560 430" role="img"
+               aria-label="Mohr circles for total and effective stress against the Mohr-Coulomb failure envelope"></svg>
+        </div>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>The circle is the stress state and the line is the strength. Failure is not a stress level, it is the moment the circle grows out to touch the line.</li>
+          <li>Pore pressure slides the circle to the left without changing its size. That is why a saturated soil can fail under a total stress that the same soil carries safely when drained.</li>
+          <li>In a drained test the total and effective circles are the same one. In an undrained test the gap between them is exactly u.</li>
+          <li>The failure plane sits at 45 + φ/2 from the plane σ1 acts on, because that is the point where the circle first touches the envelope, at 2θ = 90 + φ.</li>
+          <li>With φu = 0 the undrained strength ignores the cell pressure, so every UU circle has the same radius cu and the deviator at failure is always 2cu.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Geotechnical Engineering · CE3132 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/mohr-engine.js"></script>
+<script src="../../assets/js/shear-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
