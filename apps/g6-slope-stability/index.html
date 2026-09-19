@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Slope Stability, Method of Slices</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Slope Stability · Method of Slices</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Slope geometry, soil strength and slip circle controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 520" role="img"
+             aria-label="Slope with a draggable slip circle cut into slices, with the force polygon for the selected slice"></svg>
+      </div>
+      <div id="tablewrap" class="panel" style="margin-top:14px;overflow-x:auto"></div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Moments are taken about the centre of the circle. Every slice base sits on that same circle, so the radius cancels and the factor of safety is just the sum of the base strengths over the sum of W sin α.</li>
+          <li>α is steeply positive at the head, where the base drops away in the direction of sliding, and turns negative at the toe where the base rises. Those toe slices resist rather than drive, which is why cutting a slope at the toe is so dangerous.</li>
+          <li>Fellenius ignores the forces between slices and resolves the weight straight onto the base, which loses some normal stress and always gives the lower answer. Bishop keeps vertical equilibrium and needs iteration because F sits on both sides.</li>
+          <li>Pore pressure does not change the weight, only the effective normal stress on the base, so it eats into the friction term alone and leaves cohesion untouched.</li>
+          <li>One circle tells you nothing on its own. The slope is only as safe as its worst circle, which is what the search button hunts for.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Geotechnical Engineering · CE3132 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/slope-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
