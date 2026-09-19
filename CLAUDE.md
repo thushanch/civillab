@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-18 of 37 apps are live. Your job is to build the next app to exactly the
+19 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 18 live cards + pipeline chips
+├── index.html                  landing page, 19 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -71,13 +71,15 @@ civillab/
 │       ├── shear-engine.js     ShearEngine.solve, Mohr-Coulomb failure
 │       ├── seepage-engine.js   SeepageEngine.solve, Laplace flow net
 │       ├── consol-engine.js    ConsolEngine.solve, Terzaghi consolidation
-│       └── slope-engine.js     SlopeEngine.solve, Fellenius and Bishop
+│       ├── slope-engine.js     SlopeEngine.solve, Fellenius and Bishop
+│       └── earth-engine.js    EarthEngine.solve, Rankine/Coulomb/stability
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
     s9-influence-lines  s10-moment-distribution
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
+    f1-earth-pressure
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -345,6 +347,22 @@ SlopeEngine.solve({ Hs, beta, gamma, c, phi, ru, xc, yc, R, n, method })
 SlopeEngine.critical(inp, {nx,ny,nr})   // grid search for the worst circle
 SlopeEngine.ground(x, Hs, beta)         // crest, face, toe
 SlopeEngine.toeX(Hs, beta)              // Hs/tan(beta)
+
+// earth-engine.js  — metres, kN/m3, kPa, COMPRESSION POSITIVE
+//   x from the toe, z down from the top of the fill
+EarthEngine.solve({ H, B, tb, ts, Lt, Df, gamma, gammaSat, gammaC,
+  phi, c, beta, q, zw, theory:'rankine'|'coulomb', delta,
+  deltaB, cB, usePassive, pts, n })
+  // → { Ka, Kp, K0, lean, profile, Pa, Pw, Ph, Pv, arm, armW, z0,
+  //     Pp, PpArm, PpUse, parts, V, Mr, Mo, xbar, e, middleThird,
+  //     qmax, qmin, qToe, qHeel, offBase, FoSslide, FoSover, slideR }
+EarthEngine.Ka(phi)               // tan²(45 − φ/2)
+EarthEngine.Kp(phi)               // 1/Ka
+EarthEngine.K0(phi)               // 1 − sinφ (Jaky)
+EarthEngine.KaSloped(phi, beta)   // Rankine with sloping backfill
+EarthEngine.KaCoulomb(phi, delta, beta, theta)
+EarthEngine.crackDepth(c, gamma, ka)  // 2c/(γ√Ka)
+EarthEngine.profile(p)           // pressure integration down the wall
 ```
 
 ### Writing a new engine
@@ -364,7 +382,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -388,10 +406,14 @@ Slope stability: F is exactly proportional to cu and to 1/gamma when phi = 0,
 exactly independent of gamma when c = 0 and the slope is dry, Bishop reduces
 exactly to Fellenius at phi = 0, Bishop sits 9 to 12 per cent above Fellenius,
 and substituting Bishop F back into its own fixed point reproduces it.
+Earth pressure: Ka = tan²(45 − φ/2) giving 1/3 at φ = 30 and Ka Kp = 1,
+Coulomb collapsing to Rankine at δ = β = θ = 0, the classic Pa = 108 kN/m
+for a 6 m wall at γ = 18 and φ = 30, surcharge adding Ka q H, water adding
+½γw H², tension crack at 2c/(γ√Ka), and all stability checks moving the
+right way with geometry, friction and passive resistance.
 
 For engines still to be written:
-Tv = 0.197 at U = 50% and 0.848 at U = 90%; Ka = tan²(45 − φ/2) and
-Kp = 1/Ka; Terzaghi strip footing on φ = 0 clay Nc = 5.7 (or 5.14 for the
+Terzaghi strip footing on φ = 0 clay Nc = 5.7 (or 5.14 for the
 Prandtl value, state which you use); Greenshields qmax = vf·kj/4 at
 k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ with a Re < 1 check.
 
@@ -399,7 +421,7 @@ k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 13 apps follow.
+One IIFE. This is the shape all 19 apps follow.
 
 ```js
 (() => {
@@ -521,16 +543,13 @@ nothing.
 
 ---
 
-## 9. Remaining 19 apps
+## 9. Remaining 18 apps
 
-Build order: geotechnical, then foundations, then design modules, then
-transport and environmental. Full prose specs are in `PLAN.md`.
+Build order: foundations, then design modules, then transport and
+environmental. Full prose specs are in `PLAN.md`.
 
-**Foundations (2, Semester 7)**
+**Foundations (1, Semester 7)**
 
-- `f1-earth-pressure` CE4032. Rankine Ka and Kp, wall height, φ, surcharge,
-  water table. Pressure diagrams, Coulomb wedge, sliding, overturning and
-  bearing bars.
 - `f2-bearing-capacity` CE4032. Terzaghi or EC7 factors, B, D, water table,
   eccentricity. Failure wedge, pressure bulb, qu against applied.
 
@@ -613,7 +632,7 @@ software.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "18 live · 19 in the pipeline". Keep cards in build order.
+line, currently "19 live · 18 in the pipeline". Keep cards in build order.
 
 ---
 

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Earth Pressure &amp; Retaining Wall</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Earth Pressure &amp; Retaining Wall</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Wall geometry, backfill and base controls"></aside>
+    <div>
+      <div class="mohrgrid">
+        <div class="figwrap">
+          <svg id="wall" viewBox="0 0 460 500" role="img"
+               aria-label="Retaining wall section with the active and passive pressure diagrams drawn to scale"></svg>
+        </div>
+        <div class="figwrap">
+          <svg id="checks" viewBox="0 0 540 500" role="img"
+               aria-label="Sliding, overturning and bearing utilisation bars with the base pressure diagram and the resultant position"></svg>
+        </div>
+      </div>
+      <div id="tablewrap" class="panel" style="margin-top:14px;overflow-x:auto"></div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Ka is the fraction of the vertical stress that the soil pushes sideways once it has relaxed enough to reach the active state. At φ = 30 that fraction is exactly one third.</li>
+          <li>The pressure diagram is not one shape but several stacked. Soil weight gives the triangle, surcharge gives a rectangle, cohesion cuts the top off and opens a tension crack, and water adds its own triangle on top of everything.</li>
+          <li>Water is the wall killer. Its unit weight is only half the soil's, but it pushes with the full weight instead of Ka times it, so letting the table rise to the surface can more than double the thrust. That is what the drainage behind a real wall is for.</li>
+          <li>Three checks, three different failures. Sliding is about friction under the base, overturning is about moments around the toe, and bearing is about whether the ground can carry the corner pressure once the resultant moves off centre.</li>
+          <li>Keep the resultant inside the middle third and the whole base stays in compression. Once it steps outside, the heel lifts off and the toe pressure jumps.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Foundations &amp; Retaining Structures · CE4032 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/earth-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
