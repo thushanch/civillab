@@ -3,6 +3,12 @@
 Interactive civil engineering simulators for the University of Moratuwa syllabus.
 **14 of 34 apps are live.** Companion suite to Water Lab.
 
+| | |
+|---|---|
+| Repo | `thushanch/civillab` (public) |
+| Live | https://thushanch.github.io/civillab/ |
+| Sister suite | [`thushanch/water-lab`](https://github.com/thushanch/water-lab) |
+
 **Read [`CLAUDE.md`](CLAUDE.md) before writing any code.** It is the build brief:
 sign conventions, the brand, the exact page skeleton, the engine APIs and the
 rules that all 14 existing apps were held to. This file only covers where the

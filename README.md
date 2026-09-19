@@ -1,8 +1,11 @@
-# CivilLab · Study Aid
+# CivilLab
 
 Interactive simulators for civil engineering fundamentals, built on the
-University of Moratuwa Civil Engineering Student Handbook 2022.
-A companion suite to Water Lab by Thushan.
+University of Moratuwa Civil Engineering Student Handbook 2022, by
+**Thushan Chamika**. Part of the Curious LK Project, and a companion suite to
+[Water Lab](https://github.com/thushanch/water-lab).
+
+**Live: https://thushanch.github.io/civillab/**
 
 ## Run it
 
