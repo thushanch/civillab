@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Actions &amp; Load Combinations</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Actions &amp; Load Combinations</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Characteristic actions and category"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 580" role="img" aria-label="Factored action bar chart"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Characteristic actions (unfactored) are multiplied by partial factors to obtain design actions. The bars show each contribution.</li>
+          <li>Eq 6.10 applies both γ factors in full. Eq 6.10a reduces the leading variable by ψ₀ and 6.10b reduces the permanent by ξ = 0.925. The designer may use whichever governs.</li>
+          <li>The three SLS combinations use different ψ factors because rare overloads, frequent service loads and long term loads each matter for a different check.</li>
+          <li>The BS column shows the older 1.4 Gk + 1.6 Qk approach. It is usually more conservative than Eq 6.10, especially when the variable to permanent ratio is low.</li>
+          <li>Changing the building category changes only the ψ factors. Storage (Cat E) has ψ₀ = 1.0 so its 6.10a equals 6.10.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Actions &amp; Combinations · EN 1990, EN 1991, BS 6399 · University of Moratuwa syllabus · Study aid only, not design software</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/actions-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

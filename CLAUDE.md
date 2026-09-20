@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-20 of 37 apps are live. Your job is to build the next app to exactly the
+21 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 20 live cards + pipeline chips
+├── index.html                  landing page, 21 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -73,14 +73,15 @@ civillab/
 │       ├── consol-engine.js    ConsolEngine.solve, Terzaghi consolidation
 │       ├── slope-engine.js     SlopeEngine.solve, Fellenius and Bishop
 │       ├── earth-engine.js    EarthEngine.solve, Rankine/Coulomb/stability
-│       └── bearing-engine.js  BearingEngine.solve, bearing capacity
+│       ├── bearing-engine.js  BearingEngine.solve, bearing capacity
+│       └── actions-engine.js  ActionsEngine.solve, EN 1990 combinations
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
     s9-influence-lines  s10-moment-distribution
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
-    f1-earth-pressure  f2-bearing-capacity
+    f1-earth-pressure  f2-bearing-capacity  d1-actions
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -380,6 +381,20 @@ BearingEngine.depthFactors(D, Bp, phi)   // Hansen: dc=1+0.4k, dγ=1
 BearingEngine.waterEffect(gamma, gammaSat, D, B, zw)
 BearingEngine.wedgeGeometry(B, phi)  // Prandtl failure mechanism
 BearingEngine.boussinesqStrip(B, z)  // σz/q for a strip
+
+// actions-engine.js  — kN/m2, all actions are characteristic values
+//   EN 1990 Table A1.2(B) with UK NA xi = 0.925
+ActionsEngine.solve({ Gk, Qk1, cat1, Qk2, cat2, Qk3, cat3 })
+  // → { Gk, actions, psi1, psi2, psi3,
+  //     uls:{ eq610, eq610a, eq610b, governing, ed, maxAB, minAB },
+  //     sls:{ char, freq, qp },
+  //     bs:{ ulsGrav, ulsWind, ulsComb, sls } }
+  //   each combo has { label, gPart, q1Part, accomp, total }
+ActionsEngine.PSI                        // psi factor table by category
+ActionsEngine.psiFor(cat)                // → { name, psi0, psi1, psi2 }
+ActionsEngine.GG                         // 1.35
+ActionsEngine.GQ                         // 1.5
+ActionsEngine.XI                         // 0.925
 ```
 
 ### Writing a new engine
@@ -399,7 +414,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -437,6 +452,11 @@ and unit weight, Boussinesq strip stress σz/q = (2θ + sin2θ)/π, the Prandtl
 wedge with active at 45 + φ/2 and log spiral sweeping π/2, qu proportional
 to c and to γ, and Terzaghi giving lower qu than general at D = 0 because
 5.7 > 5.14 but no depth factors.
+Actions: gamma_G = 1.35, gamma_Q = 1.5, xi = 0.925 (UK NA), 6.10 always
+>= max(6.10a, 6.10b), Cat E psi0 = 1.0 so 6.10a = 6.10, Cat A psi
+(0.7, 0.5, 0.3), SLS char >= freq >= qp, BS 1.4 Gk + 1.6 Qk = 22 for
+Gk 10 Qk 5, all combinations proportional to loads, parts sum to total,
+and the 6.10a/b saving is always non-negative.
 
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
@@ -446,7 +466,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 20 apps follow.
+One IIFE. This is the shape all 21 apps follow.
 
 ```js
 (() => {
@@ -568,7 +588,7 @@ nothing.
 
 ---
 
-## 9. Remaining 17 apps
+## 9. Remaining 16 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -582,13 +602,6 @@ check with the governing one highlighted**, leads with the verdict and hides
 the substitution in an expandable trail, and prints a **clause reference**
 beside every result. Footer must say these teach the checks and are not design
 software.
-
-**Actions (1)**
-
-- `d1-actions` EN 1990 + EN 1991 against BS 6399. Permanent, imposed, wind and
-  snow to design actions. 6.10 beside 6.10a/b, the psi factors, and the three
-  SLS combinations from the same inputs. **Build this first**, the other design
-  apps read their actions from it.
 
 **Concrete (6)** EN 1992-1-1 against BS 8110
 
@@ -652,7 +665,7 @@ software.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "20 live · 17 in the pipeline". Keep cards in build order.
+line, currently "21 live · 16 in the pipeline". Keep cards in build order.
 
 ---
 
