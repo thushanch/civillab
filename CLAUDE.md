@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-19 of 37 apps are live. Your job is to build the next app to exactly the
+20 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 19 live cards + pipeline chips
+├── index.html                  landing page, 20 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -72,14 +72,15 @@ civillab/
 │       ├── seepage-engine.js   SeepageEngine.solve, Laplace flow net
 │       ├── consol-engine.js    ConsolEngine.solve, Terzaghi consolidation
 │       ├── slope-engine.js     SlopeEngine.solve, Fellenius and Bishop
-│       └── earth-engine.js    EarthEngine.solve, Rankine/Coulomb/stability
+│       ├── earth-engine.js    EarthEngine.solve, Rankine/Coulomb/stability
+│       └── bearing-engine.js  BearingEngine.solve, bearing capacity
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
     s9-influence-lines  s10-moment-distribution
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
-    f1-earth-pressure
+    f1-earth-pressure  f2-bearing-capacity
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -363,6 +364,22 @@ EarthEngine.KaSloped(phi, beta)   // Rankine with sloping backfill
 EarthEngine.KaCoulomb(phi, delta, beta, theta)
 EarthEngine.crackDepth(c, gamma, ka)  // 2c/(γ√Ka)
 EarthEngine.profile(p)           // pressure integration down the wall
+
+// bearing-engine.js  — kPa, metres, degrees in, COMPRESSION POSITIVE
+//   Terzaghi (Nc=5.7 at φ=0, Kumbhojkar Nγ) or General/Hansen/Vesic
+BearingEngine.solve({ method:'general'|'terzaghi', shape:'strip'|'square'|'circle'|'rect',
+  B, L, D, phi, c, gamma, gammaSat, zw, eB, eL, FoS, qApp })
+  // → { N:{Nc,Nq,Ng}, sf:{sc,sq,sg}, df:{dc,dq,dg}, Bp, Lp,
+  //     terms:{t1,t2,t3}, qu, qa, qApp, safe, wcase,
+  //     wedge:{d,alpha,spiral,surfaceX,beta}, boussinesq(z) }
+BearingEngine.generalFactors(phi)    // Nc=π+2 at φ=0, Nγ=2(Nq+1)tanφ
+BearingEngine.terzaghiFactors(phi)   // Nc=5.7 at φ=0, Kumbhojkar Nγ table
+BearingEngine.terzaghiNg(phi)        // interpolated from the Kumbhojkar table
+BearingEngine.shapeFactors(method, shape, Bp, Lp, N, phi)
+BearingEngine.depthFactors(D, Bp, phi)   // Hansen: dc=1+0.4k, dγ=1
+BearingEngine.waterEffect(gamma, gammaSat, D, B, zw)
+BearingEngine.wedgeGeometry(B, phi)  // Prandtl failure mechanism
+BearingEngine.boussinesqStrip(B, z)  // σz/q for a strip
 ```
 
 ### Writing a new engine
@@ -382,7 +399,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -411,17 +428,25 @@ Coulomb collapsing to Rankine at δ = β = θ = 0, the classic Pa = 108 kN/m
 for a 6 m wall at γ = 18 and φ = 30, surcharge adding Ka q H, water adding
 ½γw H², tension crack at 2c/(γ√Ka), and all stability checks moving the
 right way with geometry, friction and passive resistance.
+Bearing capacity: Nc = π + 2 = 5.14 (general) and 5.7 (Terzaghi) at φ = 0,
+Nq = e^(πtanφ)tan²(45+φ/2) giving 1 at φ = 0 and 18.40 at φ = 30,
+Nγ = 2(Nq+1)tanφ giving 22.40 at φ = 30, Terzaghi Nγ from the Kumbhojkar
+table, Hansen depth factors dc = 1 + 0.4(D/B) and dγ = 1, Meyerhof effective
+width B' = B − 2eB, water table reducing qu through effective overburden
+and unit weight, Boussinesq strip stress σz/q = (2θ + sin2θ)/π, the Prandtl
+wedge with active at 45 + φ/2 and log spiral sweeping π/2, qu proportional
+to c and to γ, and Terzaghi giving lower qu than general at D = 0 because
+5.7 > 5.14 but no depth factors.
 
 For engines still to be written:
-Terzaghi strip footing on φ = 0 clay Nc = 5.7 (or 5.14 for the
-Prandtl value, state which you use); Greenshields qmax = vf·kj/4 at
-k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ with a Re < 1 check.
+Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
+with a Re < 1 check.
 
 ---
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 19 apps follow.
+One IIFE. This is the shape all 20 apps follow.
 
 ```js
 (() => {
@@ -543,15 +568,10 @@ nothing.
 
 ---
 
-## 9. Remaining 18 apps
+## 9. Remaining 17 apps
 
-Build order: foundations, then design modules, then transport and
-environmental. Full prose specs are in `PLAN.md`.
-
-**Foundations (1, Semester 7)**
-
-- `f2-bearing-capacity` CE4032. Terzaghi or EC7 factors, B, D, water table,
-  eccentricity. Failure wedge, pressure bulb, qu against applied.
+Build order: design modules, then transport and environmental.
+Full prose specs are in `PLAN.md`.
 
 **Design apps, shared rules (PLAN.md has the full briefs)**
 
@@ -632,7 +652,7 @@ software.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "19 live · 18 in the pipeline". Keep cards in build order.
+line, currently "20 live · 17 in the pipeline". Keep cards in build order.
 
 ---
 
