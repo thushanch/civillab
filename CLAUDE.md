@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-21 of 37 apps are live. Your job is to build the next app to exactly the
+22 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 21 live cards + pipeline chips
+├── index.html                  landing page, 22 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -74,14 +74,15 @@ civillab/
 │       ├── slope-engine.js     SlopeEngine.solve, Fellenius and Bishop
 │       ├── earth-engine.js    EarthEngine.solve, Rankine/Coulomb/stability
 │       ├── bearing-engine.js  BearingEngine.solve, bearing capacity
-│       └── actions-engine.js  ActionsEngine.solve, EN 1990 combinations
+│       ├── actions-engine.js  ActionsEngine.solve, EN 1990 combinations
+│       └── rc-beam-engine.js  RCBeamEngine.flexure/shear/deflection/cracking
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
     s9-influence-lines  s10-moment-distribution
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
-    f1-earth-pressure  f2-bearing-capacity  d1-actions
+    f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -395,6 +396,31 @@ ActionsEngine.psiFor(cat)                // → { name, psi0, psi1, psi2 }
 ActionsEngine.GG                         // 1.35
 ActionsEngine.GQ                         // 1.5
 ActionsEngine.XI                         // 0.925
+
+// rc-beam-engine.js  — mm, MPa, kN, kN·m
+//   EC2 rectangular stress block (lambda=0.8, eta=1.0 for fck<=50)
+//   BS 8110 comparison with fcu = fck + 5
+RCBeamEngine.flexure({ b, h, d, d2, fck, fyk, MEd })
+  // → { K, Kp, doubly, z, x, xd, lam, eta, AsReq, As2Req, AsMin, AsMax,
+  //     MRd, util, steelYields, mat }
+RCBeamEngine.shear({ bw, d, fck, fyk, VEd, As1, theta })
+  // → { k, rhoL, VRdc, VRdmax, z, nu1, cotTh, tanTh, theta,
+  //     AswReq, AswMin, AswUse, needsLinks, adequate, util, thetaOpt }
+RCBeamEngine.deflection({ b, d, h, L, fck, fyk, As1, As2, type })
+  // → { rho, rho0, basic, Kb, modAs, allowable, actual, ok, util, type }
+RCBeamEngine.cracking({ b, d, h, cover, phi, fck, fyk, As1, MEd })
+  // → { sigS, hcef, rhoEff, srMax, esmEcm, wk, wkLim, wkOk, sMax, util }
+RCBeamEngine.bsFlexure({ b, d, fcu, fyk, MEd })
+  // → { K, Kp, doubly, z, As, mat }
+RCBeamEngine.bsShear({ bw, d, fck, fyk, VEd, As1 })
+  // → { v, vc, vmax }
+RCBeamEngine.matProps(fck, fyk)
+  // → { fcd, fyd, fcu, Es, ecu }
+RCBeamEngine.ACC                        // 0.85
+RCBeamEngine.GC                         // 1.5
+RCBeamEngine.GS                         // 1.15
+RCBeamEngine.ES                         // 200000
+RCBeamEngine.ECU                        // 0.0035
 ```
 
 ### Writing a new engine
@@ -414,7 +440,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 61 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -457,6 +483,13 @@ Actions: gamma_G = 1.35, gamma_Q = 1.5, xi = 0.925 (UK NA), 6.10 always
 (0.7, 0.5, 0.3), SLS char >= freq >= qp, BS 1.4 Gk + 1.6 Qk = 22 for
 Gk 10 Qk 5, all combinations proportional to loads, parts sum to total,
 and the 6.10a/b saving is always non-negative.
+RC beam: fcd = 0.85 fck/1.5 = 17 for C30, fyd = 500/1.15 = 434.78,
+K = M/(bd²fck) giving 0.0823 for 300×500 d=450 M=150, K' = 0.167 singly to
+doubly boundary, z = d[0.5 + sqrt(0.25 − K/1.134)], As = M/(fyd z) = 832,
+VRdc from CRdc = 0.12 with k = 1 + sqrt(200/d), VRdmax at 21.8° = 376 and
+at 45° = 545, nu1 = 0.6(1 − fck/250), Kb = 1.0 ss / 0.4 cant, AsMin =
+max(0.26 sqrt(fck)/fyk bd, 0.0013bd), sigS = M/(As z) = 411.5, BS 8110
+K = M/(bd²fcu) with fcu = fck + 5, doubling M doubles K, higher fck lowers K.
 
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
@@ -466,7 +499,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 21 apps follow.
+One IIFE. This is the shape all 22 apps follow.
 
 ```js
 (() => {
@@ -588,7 +621,7 @@ nothing.
 
 ---
 
-## 9. Remaining 16 apps
+## 9. Remaining 15 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -603,11 +636,8 @@ the substitution in an expandable trail, and prints a **clause reference**
 beside every result. Footer must say these teach the checks and are not design
 software.
 
-**Concrete (6)** EN 1992-1-1 against BS 8110
+**Concrete (5)** EN 1992-1-1 against BS 8110
 
-- `c1-rc-beam` CE2122. **Reuses SectionEngine.** Tabs for flexure, shear,
-  deflection and cracking. Stress block to scale, singly, doubly and flanged.
-  Variable strut angle 21.8 to 45 degrees, VRd,c and VRd,max, link spacing.
 - `c2-rc-column` CE2122. Strain compatibility sweep of the NA depth for the
   N-M diagram, draggable design point, short against slender with the nominal
   curvature moment, biaxial contours.
@@ -665,7 +695,7 @@ software.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "21 live · 16 in the pipeline". Keep cards in build order.
+line, currently "22 live · 15 in the pipeline". Keep cards in build order.
 
 ---
 
