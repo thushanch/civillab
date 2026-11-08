@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-29 of 37 apps are live. Your job is to build the next app to exactly the
+30 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 29 live cards + pipeline chips
+├── index.html                  landing page, 30 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -83,7 +83,8 @@ civillab/
 │       ├── mix-engine.js      MixEngine.solve, ACI 211.1 absolute volume
 │       ├── prestress-engine.js PrestressEngine.solve, losses and Magnel
 │       ├── steel-engine.js    SteelEngine.solve, sections, EC3 and BS 5950
-│       └── conn-engine.js     ConnEngine bolts, welds, base plates
+│       ├── conn-engine.js     ConnEngine bolts, welds, base plates
+│       └── timber-engine.js   TimberEngine.solve, EC5 and BS 5268
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -92,7 +93,7 @@ civillab/
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
     c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design  c6-prestressed
-    st1-member-capacity  st2-connections
+    st1-member-capacity  st2-connections  t1-timber
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -536,6 +537,16 @@ ConnEngine.weldPerMm(code, steel, a, theta)   // directional, K = 1.225 transver
 ConnEngine.basePlate({ code, colIdx, B, D, tp, steel, fck, padRatio, NEd })
   // → { col, fjd, c, Aeff, NjRd, tpReq, util }
 ConnEngine.BOLTS, .GRADES, .STEEL, .holeD(d)
+
+// timber-engine.js  — mm, m, kN/m, kN, MPa, actions CHARACTERISTIC, N compression +
+//   EC5 multiplies by gF, BS 5268 uses working loads
+TimberEngine.solve({ code:'ec5'|'bs', cls, b, h, L, wk, Nk, gF, duration, service,
+  ksys, kLe, lb, kc90, lateral })
+  // EC5 → { km, k_h, ks, fmd, ftd, fc0d, fc90d, fvd, sm, lef, scrit, lamM, kcr, tau, lb, sc90,
+  //         lry, lrz, kcy, kcz, u:{bend,ltb,shear,bearing,comp,tension,column} }
+  // BS  → { k3, k7, k8, smAdm, vAdm, cpAdm, lam, K12, cAdm, hb, lim, u }
+TimberEngine.CLASSES      // C16 C24 C30 D30 D40, EN 338:2009 and BS 5268-2 Table 8
+TimberEngine.kh(h), .kcrit(lamRel), .kc(lamRel), .k12(sigC, Emin, lambda)
 ```
 
 ### Writing a new engine
@@ -555,7 +566,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -662,6 +673,13 @@ tearing with the eccentric half tension term, T-stub modes 4Mpl/m,
 (2Mpl + nΣFt)/(m + n) and ΣFt, an 8 mm S275 fillet at 1.25 kN/mm and 1.225
 times that transverse, BS K = 1.25, fjd = (2/3)fcd√(Ac1/Ac0), c = tp√(fy/3fjd).
 
+Timber: kmod 0.8 medium term class 1 and 0.5 permanent class 3, γM 1.3,
+fm,d = 14.77 MPa for C24, kh = (150/h)^0.2 capped at 1.3, ksys 1.1 on bending
+only, kcrit = 1.56 − 0.75λrel,m between 0.75 and 1.4, lef = 0.9L + 2h, kc =
+0.285 at λrel 1.762 for a 100 square 3 m post, bearing over l + 30 + 30, BS
+K7 = (300/h)^0.11, K3 1.25 medium term, K2 0.8 wet bending, K12 = 0.417 at
+λ 104 from Annex B, Table 19 depth to breadth limits.
+
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
 with a Re < 1 check.
@@ -670,7 +688,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 29 apps follow.
+One IIFE. This is the shape all 30 apps follow.
 
 ```js
 (() => {
@@ -792,7 +810,7 @@ nothing.
 
 ---
 
-## 9. Remaining 8 apps
+## 9. Remaining 7 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -815,11 +833,8 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 **Steel (0)** EN 1993-1-1 against BS 5950
 
 
-**Timber and masonry (2)**
+**Timber and masonry (1)**
 
-- `t1-timber` CE3122. EN 1995-1-1 against BS 5268. kmod and gammaM chain to fd,
-  with kh, kcrit and ksys when they apply, then bending both axes, shear,
-  compression parallel and perpendicular, and buckling with kc.
 - `m1-masonry` CE3122. EN 1996-1-1 against BS 5628. Effective height and
   thickness, slenderness and eccentricity to the reduction factor Phi, vertical
   resistance, then a lateral tab with orthogonal ratio and arching.
@@ -847,7 +862,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "29 live · 8 in the pipeline". Keep cards in build order.
+line, currently "30 live · 7 in the pipeline". Keep cards in build order.
 
 ---
 

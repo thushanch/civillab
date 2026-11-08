@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Timber Member Designer</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Timber Member Designer</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Strength class, duration, service class, section and load controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 560" role="img" aria-label="The modification chain from characteristic to design strength, the member with its bending, shear and bearing stresses, or the buckling curve"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn" id="trail"></details>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Timber is weaker the longer a load stays on it, and weaker again when it is wet. kmod carries both effects at once, which is why a roof under snow can take more than a floor under its own weight.</li>
+          <li>The chain runs from the characteristic strength through kmod, kh and ksys to the design value. Each box only appears when it changes something.</li>
+          <li>A deep narrow joist can twist sideways before it breaks. kcrit falls once the relative slenderness passes 0.75, and blocking or a nailed floor brings it back to one.</li>
+          <li>Timber is soft across the grain. A beam can pass bending and shear and still crush the timber where it sits on its support.</li>
+          <li>BS 5268 works with permissible stresses under working loads, so its K factors play the part of kmod and the safety margin hides inside the grade stresses.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Timber · CE3122 · EN 1995-1-1 / BS 5268-2 · University of Moratuwa syllabus · Teaches the checks, not design software</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/design-kit.js"></script>
+<script src="../../assets/js/timber-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
