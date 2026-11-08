@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-27 of 37 apps are live. Your job is to build the next app to exactly the
+28 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 27 live cards + pipeline chips
+├── index.html                  landing page, 28 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -81,7 +81,8 @@ civillab/
 │       ├── slab-engine.js     SlabEngine.solve/punch, coefficients and punching
 │       ├── detail-engine.js   DetailEngine.solve, anchorage, cover, spacing
 │       ├── mix-engine.js      MixEngine.solve, ACI 211.1 absolute volume
-│       └── prestress-engine.js PrestressEngine.solve, losses and Magnel
+│       ├── prestress-engine.js PrestressEngine.solve, losses and Magnel
+│       └── steel-engine.js    SteelEngine.solve, sections, EC3 and BS 5950
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -90,6 +91,7 @@ civillab/
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
     c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design  c6-prestressed
+    st1-member-capacity
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -504,6 +506,21 @@ PrestressEngine.magnel(sec, Mg, Ms, eta, lim, box)   // half-planes in (e, 1/P0)
 PrestressEngine.pRange(cons, e)    // P0 window at one eccentricity
 PrestressEngine.fibre(P, e, M, sec, -1|+1)   // top or bottom stress
 PrestressEngine.Ecm(fck), .fctm(fck), .limits(code, type, fck, fckt, mode)
+
+// steel-engine.js  — mm, m, kN, kN·m, MPa, E 210 GPa, N COMPRESSION POSITIVE
+//   properties computed from h b tw tf r with the fillets, within a few % of the tables
+SteelEngine.solve({ code:'ec3'|'bs', family:'UB'|'UC'|'SHS', idx, grade:'S275'|'S355',
+  N, M, V, L, ky, kz, nRest, shape:'uniform'|'udl'|'point'|'linear', psi, holes, d0 })
+  // EC3 → { s, fy, eps, cl, Npl, Nu, NtRd, lamy, lamz, chiy, chiz, Nby, Nbz, Mcr, lamLT,
+  //         chiLT, f, chiMod, McRd, MbRd, VplRd, kyy, kzy, i61, i62, u:{...} }
+  // BS  → { s, fy, cl, Pt, pcx, pcy, Pcx, Pcy, Mc, lamLT, pb, Mb, Pv, i1, i2, u:{...} }
+  //   u = { tension, comp, section, bend, shear, combined } as demand / resistance
+SteelEngine.section(family, idx)   // → { A, Iy, Iz, Wely, Wply, It, Iw, iy, iz, cf, cw, Av }
+SteelEngine.TABLE                  // UB, UC and SHS nominal dimensions
+SteelEngine.classify(s, fy, N)     // Table 5.2 with alpha and psi for the web
+SteelEngine.chi(lambda, curve)     // Table 6.2, curves a0 to d
+SteelEngine.perry(py, lambda, a)   // BS 5950 Annex C strut curve
+SteelEngine.shape(kind, psi)       // C1, kc, Cm, mLT, mx
 ```
 
 ### Writing a new engine
@@ -523,7 +540,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -616,6 +633,13 @@ Ap(Ep/Ecm(t))σc halved for sequential post-tensioning, eq 5.46 with eq 3.29
 relaxation whose three parts sum to the total, and the Magnel force window
 whose two ends each just meet the tightest of the eight fibre limits.
 
+Steel: 457×191×67 from its dimensions gives A 85.5 cm², Iy 29 400, Iz 1450,
+Wpl,y 1470 cm³ and Iw 0.705 dm⁶, matching the tables, c/t = 6.34 and 47.95
+so class 1 at ε = 0.924, χ = 0.666, 0.597, 0.540, 0.467 at λ̄ = 1 on curves
+a to d, Mcr about 240 kNm at 6 m under uniform moment and 1.127 times that
+for a UDL, χLT on curve c because h/b > 2, BS pc = 142.7 (Table 24b) and
+159.8 (24a) at λ 100, pb = 126 at λLT 100 (Table 16), Nu,Rd = 0.9Anet fu/1.25.
+
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
 with a Re < 1 check.
@@ -624,7 +648,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 27 apps follow.
+One IIFE. This is the shape all 28 apps follow.
 
 ```js
 (() => {
@@ -746,7 +770,7 @@ nothing.
 
 ---
 
-## 9. Remaining 10 apps
+## 9. Remaining 9 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -766,13 +790,8 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 **Concrete (0)** EN 1992-1-1 against BS 8110
 
 
-**Steel (2)** EN 1993-1-1 against BS 5950
+**Steel (1)** EN 1993-1-1 against BS 5950
 
-- `st1-member-capacity` CE2022. Embedded UB, UC and hollow section table.
-  Tabs for classification with c/t measured on the drawn section, tension,
-  compression on the right buckling curve, bending with lateral torsional
-  buckling and restraint positions, and the combined interaction.
-  Use the shared utilisation bars in `design-kit.js`, built early in C2.
 - `st2-connections` CE2022. Tabs for the bolt group, welds and the base plate.
   Bolt shear, bearing on both plies, tension with prying, block tear drawn on
   the plate, fillet welds by the directional method, base plate effective area.
@@ -809,7 +828,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "27 live · 10 in the pipeline". Keep cards in build order.
+line, currently "28 live · 9 in the pipeline". Keep cards in build order.
 
 ---
 
