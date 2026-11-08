@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-22 of 37 apps are live. Your job is to build the next app to exactly the
+23 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 22 live cards + pipeline chips
+├── index.html                  landing page, 23 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -75,7 +75,9 @@ civillab/
 │       ├── earth-engine.js    EarthEngine.solve, Rankine/Coulomb/stability
 │       ├── bearing-engine.js  BearingEngine.solve, bearing capacity
 │       ├── actions-engine.js  ActionsEngine.solve, EN 1990 combinations
-│       └── rc-beam-engine.js  RCBeamEngine.flexure/shear/deflection/cracking
+│       ├── design-kit.js      DesignKit.bars/chain/trail, shared design UI
+│       ├── rc-beam-engine.js  RCBeamEngine.flexure/shear/deflection/cracking
+│       └── rc-column-engine.js RCColumnEngine.solve, N-M sweep, slenderness
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -83,6 +85,7 @@ civillab/
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
+    c2-rc-column
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -421,6 +424,30 @@ RCBeamEngine.GC                         // 1.5
 RCBeamEngine.GS                         // 1.15
 RCBeamEngine.ES                         // 200000
 RCBeamEngine.ECU                        // 0.0035
+
+// rc-column-engine.js  — mm, MPa, kN, kN·m, l0 in m, N COMPRESSION POSITIVE
+//   EC2 block 0.8x at fcd with the 3h/7 pivot once x > h, BS 0.9x at 0.45fcu
+RCColumnEngine.solve({ code:'ec2'|'bs', b, h, cover, link, phi, nx, ny,
+  fck, fyk, NEd, Mx, My, l0, rm, phiEf })
+  // → { m, layX, layY, ix, iy, As, rho, sx, sy, MEdx, MEdy, MRdx, MRdy,
+  //     capX, capY, NRd, axialUtil, ux, uy, biax, AsMin, AsMax }
+RCColumnEngine.layout({ b, h, cover, link, phi, nx, ny })  // → { bars, layers, As, d2, d }
+RCColumnEngine.section(b, h, layers, mat, x)   // → { N, M, a, steel[], etop, ebot }
+RCColumnEngine.interaction(b, h, lay, mat)
+  // → { pts:[{x,N,M}], N0, Nt, bal:{x,N,M}, pureM, MRd(N) }
+RCColumnEngine.ec2Slender(p)   // λ, λlim = 20ABC/√n, ei, e2, M2, MEd (5.8.8)
+RCColumnEngine.bsSlender(p)    // le/h, Nuz, K, au, Madd, Mt (3.8.3)
+RCColumnEngine.biaxialA(NEd/NRd)   // EC2 5.8.9 exponent a
+RCColumnEngine.bsBeta(N/bhfcu)     // BS Table 3.22
+
+// design-kit.js  — shared figure pieces for every design app, needs ui.js
+DesignKit.bars(svg, { x, y, w, title, gap, max }, [{ name, util, clause, note }])
+  // one utilisation bar per check, governing one outlined → { gov, bottom }
+DesignKit.chain(svg, { x, y, w, h, title, clause }, [{ op, sym, val }])
+  // a design strength as its chain of multipliers, last box is the result
+DesignKit.trail(detailsEl, 'Show the working', [{ t: html, c: clause }])
+DesignKit.verdict(items)   // → [ 'Passes'|'Fails', sub, cls ] for a chip
+DesignKit.governing(items)
 ```
 
 ### Writing a new engine
@@ -440,7 +467,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 61 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 61 + 92 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -491,6 +518,15 @@ at 45° = 545, nu1 = 0.6(1 − fck/250), Kb = 1.0 ss / 0.4 cant, AsMin =
 max(0.26 sqrt(fck)/fyk bd, 0.0013bd), sigS = M/(As z) = 411.5, BS 8110
 K = M/(bd²fcu) with fcu = fck + 5, doubling M doubles K, higher fck lowers K.
 
+RC column: N0 = 17(Ac − As) + 400 As = 2011 kN for 300×300 4H20 because the
+3h/7 pivot holds the strain at 0.002, Nt = −As fyd, balanced x = 0.617d with
+the tension steel just at fyd/Es, a plain concrete point N = 816 kN and
+M = 138.72 kNm at x = 200, pure bending of a symmetric 3H20 section solved
+by a hand quadratic to x = 65.7 mm and M = 170.3 kNm, λ = l0√12/h = 46.19,
+λlim = 13.33 with the default A B C and 18.89 with the real ones, Kr = 0.735,
+Kφ = 1.192, e2 = 27.1 mm, BS Nuz = 0.45fcu(Ac − As) + 0.87fyAsc,
+βa = (le/b)²/2000, biaxial a = 1, 1.25, 1.5, 2 at NEd/NRd 0.1, 0.4, 0.7, 1.0.
+
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
 with a Re < 1 check.
@@ -499,7 +535,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 22 apps follow.
+One IIFE. This is the shape all 23 apps follow.
 
 ```js
 (() => {
@@ -621,7 +657,7 @@ nothing.
 
 ---
 
-## 9. Remaining 15 apps
+## 9. Remaining 14 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -634,13 +670,12 @@ multipliers** ending in the design value, gives **one utilisation bar per
 check with the governing one highlighted**, leads with the verdict and hides
 the substitution in an expandable trail, and prints a **clause reference**
 beside every result. Footer must say these teach the checks and are not design
-software.
+software. `assets/js/design-kit.js` holds the shared bars, multiplier chains
+and working trail, so every design app from C2 on uses it rather than drawing
+its own. The trail fills a `<details class="learn" id="trail">` element.
 
-**Concrete (5)** EN 1992-1-1 against BS 8110
+**Concrete (4)** EN 1992-1-1 against BS 8110
 
-- `c2-rc-column` CE2122. Strain compatibility sweep of the NA depth for the
-  N-M diagram, draggable design point, short against slender with the nominal
-  curvature moment, biaxial contours.
 - `c3-rc-slab` CE2122. One way and two way panels, moment coefficients on each
   strip, punching shear with the control perimeters drawn at 2d.
 - `c4-detailing` CE2122. Anchorage and lap lengths with the alpha1 to alpha5
@@ -657,8 +692,7 @@ software.
   Tabs for classification with c/t measured on the drawn section, tension,
   compression on the right buckling curve, bending with lateral torsional
   buckling and restraint positions, and the combined interaction.
-  **Build the reusable utilisation-bar component here**, then reuse it in
-  c1, c2, c4, c6, st2, t1, m1, f1, f2, tr3.
+  Use the shared utilisation bars in `design-kit.js`, built early in C2.
 - `st2-connections` CE2022. Tabs for the bolt group, welds and the base plate.
   Bolt shear, bearing on both plies, tension with prying, block tear drawn on
   the plate, fillet welds by the directional method, base plate effective area.
@@ -695,7 +729,7 @@ software.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "22 live · 15 in the pipeline". Keep cards in build order.
+line, currently "23 live · 14 in the pipeline". Keep cards in build order.
 
 ---
 
