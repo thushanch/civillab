@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-32 of 37 apps are live. Your job is to build the next app to exactly the
+33 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 32 live cards + pipeline chips
+├── index.html                  landing page, 33 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -86,7 +86,8 @@ civillab/
 │       ├── conn-engine.js     ConnEngine bolts, welds, base plates
 │       ├── timber-engine.js   TimberEngine.solve, EC5 and BS 5268
 │       ├── masonry-engine.js  MasonryEngine vertical, lateral, yield lines
-│       └── traffic-engine.js  TrafficEngine.solve, models and shockwaves
+│       ├── traffic-engine.js  TrafficEngine.solve, models and shockwaves
+│       └── alignment-engine.js AlignmentEngine SSD, radius, sight, vertical
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -96,7 +97,7 @@ civillab/
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
     c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design  c6-prestressed
     st1-member-capacity  st2-connections  t1-timber  m1-masonry
-    tr1-traffic-flow
+    tr1-traffic-flow  tr2-alignment
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -571,6 +572,14 @@ TrafficEngine.solve({ model:'greenshields'|'greenberg'|'underwood', vf, kj, kA, 
 TrafficEngine.model(type, vf, kj)
 TrafficEngine.densitiesForFlow(vf, kj, q)   // Greenshields, both roots
 TrafficEngine.shock(A, B)                   // (qB - qA)/(kB - kA)
+
+// alignment-engine.js  — km/h, m, grades in %, e and f as decimals, AASHTO 2011 metric
+AlignmentEngine.solve({ V, t, a, G, e, fAuto, f, R, delta, M, g1, g2, L })
+  // → { sd:{react,brake,S}, f, Rm, Lc, Mneed, Savail, A, crest, Lmin, Sv, K, Kmin,
+  //     u:{radius,hsight,vsight} }
+AlignmentEngine.ssd(V, t, a, G), .rmin(V, e, f), .fmax(V)
+AlignmentEngine.hso(R, S, Lc), .sightFromOffset(R, M, Lc)
+AlignmentEngine.crestL(A, S), .sagL(A, S), .crestS(A, L), .sagS(A, L)
 ```
 
 ### Writing a new engine
@@ -590,7 +599,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 + 47 + 33 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 + 47 + 33 + 32 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -717,6 +726,12 @@ qmax = vf ko/e, each confirmed by a numerical search, the two densities
 for one flow summing to kj, and the shock speed (qB − qA)/(kB − kA) equal to
 vf(1 − (kA + kB)/kj) under Greenshields.
 
+Alignment: SSD = 0.278Vt + V²/(254(a/g + G)) = 183 m at 100 km/h (table 185)
+and 63 at 50, Rmin = V²/127(e + f) = 394 m at e 8% with fmax 0.12, M = R(1 −
+cos(S/2R)) close to S²/8R with the long form joining at S = Lc, crest L =
+AS²/658 giving K 50.9 (table 52), sag L = AS²/(120 + 3.5S) giving K 44.0
+(table 45), the S > L forms, and each L to S inversion round tripping.
+
 For engines still to be written:
 Stokes vs = g(ρs − ρ)d²/18μ with a Re < 1 check.
 
@@ -724,7 +739,7 @@ Stokes vs = g(ρs − ρ)d²/18μ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 32 apps follow.
+One IIFE. This is the shape all 33 apps follow.
 
 ```js
 (() => {
@@ -846,7 +861,7 @@ nothing.
 
 ---
 
-## 9. Remaining 5 apps
+## 9. Remaining 4 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -873,10 +888,8 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 
 
 
-**Transportation (2)**
+**Transportation (1)**
 
-- `tr2-alignment` CE3162 and CE4042. Horizontal curve in plan and vertical
-  curve in profile, SSD drawn and checked.
 - `tr3-pavement` CE4042. Layered section, stress decay with depth, subgrade
   CBR driving thickness, strain check bar.
 
@@ -893,7 +906,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "32 live · 5 in the pipeline". Keep cards in build order.
+line, currently "33 live · 4 in the pipeline". Keep cards in build order.
 
 ---
 
