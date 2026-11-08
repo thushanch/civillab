@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Prestressed Concrete Beam</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Prestressed Concrete Beam</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Section, span, loads, prestress force, eccentricity and loss controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 600" role="img" aria-label="Fibre stresses at transfer and in service, the Magnel diagram with a draggable force and eccentricity, or the prestress loss waterfall"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn" id="trail"></details>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Stresses here are compression positive, the usual prestressing convention. The tendon below the centroid squeezes the bottom fibre and lifts the top one, and the load does the opposite.</li>
+          <li>Two moments of truth. At transfer the force is at its largest and only the self weight helps, so the top cracks or the bottom crushes. In service the force has fallen and the full load acts, so the bottom goes into tension.</li>
+          <li>The Magnel diagram turns the four fibre limits into straight lines in eccentricity against one over the force. Any point inside the shaded region satisfies all of them at once. Drag the point and see which line it crosses.</li>
+          <li>The tendon loses force before the beam ever carries load. Friction and draw-in in the duct, the concrete shortening as it is squeezed, then shrinkage, creep and relaxation over the years. A fifth of the jacking force is a typical total.</li>
+          <li>The code toggle changes only the allowable stresses. The losses follow EN 1992-1-1 5.10 in both cases.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Prestressed Concrete · CE4012 · EN 1992-1-1 / BS 8110 · University of Moratuwa syllabus · Teaches the checks, not design software</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/design-kit.js"></script>
+<script src="../../assets/js/section-engine.js"></script>
+<script src="../../assets/js/prestress-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

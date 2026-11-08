@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-26 of 37 apps are live. Your job is to build the next app to exactly the
+27 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 26 live cards + pipeline chips
+├── index.html                  landing page, 27 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -80,7 +80,8 @@ civillab/
 │       ├── rc-column-engine.js RCColumnEngine.solve, N-M sweep, slenderness
 │       ├── slab-engine.js     SlabEngine.solve/punch, coefficients and punching
 │       ├── detail-engine.js   DetailEngine.solve, anchorage, cover, spacing
-│       └── mix-engine.js      MixEngine.solve, ACI 211.1 absolute volume
+│       ├── mix-engine.js      MixEngine.solve, ACI 211.1 absolute volume
+│       └── prestress-engine.js PrestressEngine.solve, losses and Magnel
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -88,7 +89,7 @@ civillab/
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
-    c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design
+    c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design  c6-prestressed
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -490,6 +491,19 @@ MixEngine.target(method, fck, sd)   // EN fck + 1.64s, ACI 318 max of two
 MixEngine.wcFor(f) / strengthFor(wc) // Table 6.3.4a, linear, both ways
 MixEngine.water(slump, dmax)         // → { W, air }
 MixEngine.coarseVol(dmax, FM)
+
+// prestress-engine.js  — mm section, m span, kN/m, kN, MPa, COMPRESSION POSITIVE
+//   e measured down from the centroid, losses to EC2 5.10 for both codes
+PrestressEngine.solve({ code, type:'pre'|'post', shape, dims, L, wsdl, wq, psi2,
+  Pj, Ap, Ep, e, eEnd, mu, k, slip, fck, fckt, fpk, rho1000, ecs, phi, mode, cp })
+  // → { sec, wg, Mg, Ms, Mqp, lim:{trC,trT,svC,svT}, ls, st:{trTop,trBot,svTop,svBot},
+  //     u, jack, eMax, mg:{cons,poly}, box, pr:{ok,Pmin,Pmax} }
+PrestressEngine.losses(p, sec, Mg, Mqp)
+  // → { dFric, lset, dSet, dEl, P0, dRel, scQP, dShr, dCreep, dRelx, dLong, Pe, eta }
+PrestressEngine.magnel(sec, Mg, Ms, eta, lim, box)   // half-planes in (e, 1/P0)
+PrestressEngine.pRange(cons, e)    // P0 window at one eccentricity
+PrestressEngine.fibre(P, e, M, sec, -1|+1)   // top or bottom stress
+PrestressEngine.Ecm(fck), .fctm(fck), .limits(code, type, fck, fckt, mode)
 ```
 
 ### Writing a new engine
@@ -509,7 +523,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -594,6 +608,14 @@ example 289 kg cement, 1136 kg stone and 775 kg sand with the volumes
 summing to one, durability caps overriding strength, the minimum cement
 lowering the w/c, and the moisture correction keeping the batch mass.
 
+Prestressed: fibre stress P/A ∓ Pe/Z ± M/Z giving −2.78 and 13.89 MPa for
+1000 kN at e 150 on 300×600, top plus bottom = 2P/A, Ecm(30) = 32.8 GPa,
+friction 16.95 kN for θ = 0.04 and kx = 0.05 at μ 0.19, draw-in by the
+reflected friction line with the past-the-end case, elastic shortening
+Ap(Ep/Ecm(t))σc halved for sequential post-tensioning, eq 5.46 with eq 3.29
+relaxation whose three parts sum to the total, and the Magnel force window
+whose two ends each just meet the tightest of the eight fibre limits.
+
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
 with a Re < 1 check.
@@ -602,7 +624,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 26 apps follow.
+One IIFE. This is the shape all 27 apps follow.
 
 ```js
 (() => {
@@ -724,7 +746,7 @@ nothing.
 
 ---
 
-## 9. Remaining 11 apps
+## 9. Remaining 10 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -741,10 +763,8 @@ software. `assets/js/design-kit.js` holds the shared bars, multiplier chains
 and working trail, so every design app from C2 on uses it rather than drawing
 its own. The trail fills a `<details class="learn" id="trail">` element.
 
-**Concrete (1)** EN 1992-1-1 against BS 8110
+**Concrete (0)** EN 1992-1-1 against BS 8110
 
-- `c6-prestressed` CE4012. **Reuses SectionEngine.** Transfer and service
-  fibre stresses side by side, Magnel diagram, losses as a waterfall.
 
 **Steel (2)** EN 1993-1-1 against BS 5950
 
@@ -789,7 +809,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "26 live · 11 in the pipeline". Keep cards in build order.
+line, currently "27 live · 10 in the pipeline". Keep cards in build order.
 
 ---
 

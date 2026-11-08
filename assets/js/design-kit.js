@@ -21,10 +21,11 @@ const DesignKit = (() => {
     return s('text', a, str);
   }
 
-  /* index of the worst check, ignoring any without a finite utilisation */
+  /* index of the worst check. An infinite utilisation, such as any tension
+     where none is allowed, is the worst of all, and NaN is ignored */
   function governing(items) {
     let g = -1, worst = -Infinity;
-    items.forEach((it, i) => { if (isFinite(it.util) && it.util > worst) { worst = it.util; g = i; } });
+    items.forEach((it, i) => { if (!isNaN(it.util) && it.util > worst) { worst = it.util; g = i; } });
     return g;
   }
 
@@ -102,7 +103,8 @@ const DesignKit = (() => {
     const g = governing(items);
     if (g < 0) return ['–', '', ''];
     const u = items[g].util, pass = u <= 1 + 1e-9;
-    return [pass ? 'Passes' : 'Fails', `${items[g].name} at ${fmt(u * 100, 0)}%`, pass ? 'ok' : 'warn'];
+    return [pass ? 'Passes' : 'Fails', isFinite(u) ? `${items[g].name} at ${fmt(u * 100, 0)}%`
+      : `${items[g].name}, not allowed at all`, pass ? 'ok' : 'warn'];
   }
 
   return { bars, chain, trail, governing, verdict, C };
