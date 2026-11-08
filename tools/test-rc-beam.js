@@ -186,6 +186,35 @@ console.log('\n=== BS 8110 shear ===');
   ok('BS vmax', r.vmax, Math.min(0.8 * Math.sqrt(35), 5), 0.01);
 }
 
+console.log('\n=== Deflection steel stress factor, EC2 7.4.2(2) UK NA ===');
+{
+  var a = RCB.deflection({ b:300, d:450, h:500, L:6, fck:30, fyk:500, As1:900, type:'ss' });
+  ok('310/sigma_s = 1.0 at fyk 500 with As just sufficient', a.modAs, 1.0, 1e-12);
+  var b2 = RCB.deflection({ b:300, d:450, h:500, L:6, fck:30, fyk:500, As1:900, AsReq:750, type:'ss' });
+  ok('310/sigma_s = 900/750 = 1.2', b2.modAs, 1.2, 1e-12);
+  var c2 = RCB.deflection({ b:300, d:450, h:500, L:6, fck:30, fyk:500, As1:1800, AsReq:600, type:'ss' });
+  ok('310/sigma_s capped at 1.5', c2.modAs, 1.5, 1e-12);
+  ok('allowable = Kb x basic x factor', b2.allowable, b2.Kb * b2.basic * 1.2, 1e-9);
+}
+
+console.log('\n=== BS 8110 Table 3.8 vc ===');
+{
+  // 100As/bd = 1, d = 400, fcu = 25: vc = 0.79 x 1 x 1 / 1.25 = 0.632
+  var v1 = RCB.bsShear({ bw:1000, d:400, fcu:25, VEd:100, As1:4000 });
+  ok('vc = 0.632 at rho 1%, d 400, fcu 25', v1.vc, 0.632, 1e-9);
+  // d = 500 > 400 keeps (400/d)^1/4 at 1, rho still 1%
+  var v2 = RCB.bsShear({ bw:1000, d:500, fcu:25, VEd:100, As1:5000 });
+  ok('(400/d)^1/4 not below 1', v2.vc, 0.632, 1e-9);
+  // fcu 40 gives the factor (40/25)^1/3 = 1.1696, and fcu 50 is capped at 40
+  var v3 = RCB.bsShear({ bw:1000, d:400, fcu:40, VEd:100, As1:4000 });
+  ok('fcu 40 factor (1.6)^1/3', v3.vc, 0.632 * Math.pow(1.6, 1 / 3), 1e-9);
+  var v4 = RCB.bsShear({ bw:1000, d:400, fcu:50, VEd:100, As1:4000 });
+  ok('fcu capped at 40', v4.vc, v3.vc, 1e-12);
+  // d = 200: (400/200)^1/4 = 1.1892
+  var v5 = RCB.bsShear({ bw:1000, d:200, fcu:25, VEd:100, As1:2000 });
+  ok('(400/d)^1/4 at d 200', v5.vc, 0.632 * Math.pow(2, 0.25), 1e-9);
+}
+
 console.log('\n=== Proportionality: doubling MEd doubles K ===');
 {
   var r1 = RCB.flexure({ b:300, h:500, d:450, fck:30, fyk:500, MEd:100 });

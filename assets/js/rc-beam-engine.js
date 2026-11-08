@@ -215,7 +215,10 @@ const RCBeamEngine = (() => {
               (1.0 / 12) * Math.sqrt(fck) * Math.sqrt(rhop / rho0);
     }
 
-    var modAs = 310 / (fyk / GS * (As1 > 0 ? As1 / As1 : 1));
+    /* EC2 7.4.2(2) with the UK NA form 310/sigma_s = (500/fyk)(As,prov/As,req),
+       capped at 1.5. Without As,req the steel is taken as just sufficient */
+    var AsReqD = inp.AsReq > 0 ? inp.AsReq : As1;
+    var modAs = 500 / fyk * (AsReqD > 0 ? As1 / AsReqD : 1);
     modAs = Math.min(modAs, 1.5);
 
     var modAs2 = rhop > 0 ? 1 : 1;
@@ -227,7 +230,7 @@ const RCBeamEngine = (() => {
     var ok = actual <= allowable;
 
     return {
-      b:b, d:d, h:h, L:L,
+      b:b, d:d, h:h, L:L, AsReq:AsReqD,
       rho:rho, rhop:rhop, rho0:rho0,
       Kb:Kb, basic:basic, type:type,
       modAs:modAs,
@@ -331,9 +334,12 @@ const RCBeamEngine = (() => {
 
     var v = V * 1000 / (b * d);
 
+    /* BS 8110-1 Table 3.8: 100As/bd capped at 3, (400/d)^1/4 not below 1,
+       and the (fcu/25)^1/3 factor with fcu capped at 40 */
     var rho = 100 * As1 / (b * d);
     rho = Math.min(rho, 3);
-    var vc = 0.79 * Math.pow(rho, 1.0 / 3.0) * Math.pow(400 / d, 0.25) / 1.25;
+    var vc = 0.79 * Math.pow(rho, 1.0 / 3.0) * Math.pow(Math.max(400 / d, 1), 0.25) / 1.25 *
+             Math.pow(Math.min(fcu, 40) / 25, 1.0 / 3.0);
     vc = Math.min(vc, 0.8 * Math.sqrt(fcu));
 
     var vmax = 0.8 * Math.sqrt(fcu);
