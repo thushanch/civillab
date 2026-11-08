@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-25 of 37 apps are live. Your job is to build the next app to exactly the
+26 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 25 live cards + pipeline chips
+├── index.html                  landing page, 26 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -79,7 +79,8 @@ civillab/
 │       ├── rc-beam-engine.js  RCBeamEngine.flexure/shear/deflection/cracking
 │       ├── rc-column-engine.js RCColumnEngine.solve, N-M sweep, slenderness
 │       ├── slab-engine.js     SlabEngine.solve/punch, coefficients and punching
-│       └── detail-engine.js   DetailEngine.solve, anchorage, cover, spacing
+│       ├── detail-engine.js   DetailEngine.solve, anchorage, cover, spacing
+│       └── mix-engine.js      MixEngine.solve, ACI 211.1 absolute volume
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -87,7 +88,7 @@ civillab/
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
-    c2-rc-column  c3-rc-slab  c4-detailing
+    c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -477,6 +478,18 @@ DetailEngine.cover(p)    // → { S, cdur, cminb, cmin, a, cfire, parts[], cnom,
 DetailEngine.spacing(p)  // → { need, clear, ok, nMax, inside }
 DetailEngine.fireAxis(member, R, b)        // EN 1992-1-2 Tables 5.5, 5.8
 DetailEngine.structuralClass(expo, fck, life100, slab)   // Table 4.3N
+
+// mix-engine.js  — MPa cylinder, kg/m3, mm, moisture as fractions
+//   ACI 211.1 Tables 6.3.3, 6.3.4a, 6.3.6, cement RD 3.15
+MixEngine.solve({ method:'en'|'aci', fck, sd, slump:'25-50'|'75-100'|'150-175',
+  dmax, FM, druw, sgCA, sgFA, wcMax, cMin, manual, wcUser, mcCA, abCA, mcFA, abFA })
+  // → { t:{fm,margin,eq}, wcStr, wc, wcEff, governedBy, W, air, C, Vca, CA, FA,
+  //     vol:{water,cement,coarse,air,fine}, field, density, ratio, perBag, fExp,
+  //     strengthUtil, durUtil, cementUtil, feasible }
+MixEngine.target(method, fck, sd)   // EN fck + 1.64s, ACI 318 max of two
+MixEngine.wcFor(f) / strengthFor(wc) // Table 6.3.4a, linear, both ways
+MixEngine.water(slump, dmax)         // → { W, air }
+MixEngine.coarseVol(dmax, FM)
 ```
 
 ### Writing a new engine
@@ -496,7 +509,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -574,6 +587,13 @@ l = φ fs/4fbu = 735 mm with fbu = 0.5√fcu, Table 4.4N 25 mm for XC3 at S4
 giving cnom 35, S3 at C35, S6 for 100 years, fire a = 25 at R60 b 300 and
 80 at R180 b 240, BS moderate cover 35 at C35, clear gap max(φ, dg + 5, 20).
 
+Mix design: EN target fck + 1.64s = 38.2 at C30 s 5, ACI 318 1.34s or
+2.33s − 3.45, w/c 0.54 at 30 MPa and 0.626 at 24, water 181 kg and 1% air
+for 75 to 100 mm slump and 37.5 mm stone, Vca 0.71 at FM 2.8, the worked
+example 289 kg cement, 1136 kg stone and 775 kg sand with the volumes
+summing to one, durability caps overriding strength, the minimum cement
+lowering the w/c, and the moisture correction keeping the batch mass.
+
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
 with a Re < 1 check.
@@ -582,7 +602,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 25 apps follow.
+One IIFE. This is the shape all 26 apps follow.
 
 ```js
 (() => {
@@ -704,7 +724,7 @@ nothing.
 
 ---
 
-## 9. Remaining 12 apps
+## 9. Remaining 11 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -721,10 +741,8 @@ software. `assets/js/design-kit.js` holds the shared bars, multiplier chains
 and working trail, so every design app from C2 on uses it rather than drawing
 its own. The trail fills a `<details class="learn" id="trail">` element.
 
-**Concrete (2)** EN 1992-1-1 against BS 8110
+**Concrete (1)** EN 1992-1-1 against BS 8110
 
-- `c5-mix-design` CE1132. Target strength, w/c, grading, workability.
-  Document the method used.
 - `c6-prestressed` CE4012. **Reuses SectionEngine.** Transfer and service
   fibre stresses side by side, Magnel diagram, losses as a waterfall.
 
@@ -771,7 +789,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "25 live · 12 in the pipeline". Keep cards in build order.
+line, currently "26 live · 11 in the pipeline". Keep cards in build order.
 
 ---
 

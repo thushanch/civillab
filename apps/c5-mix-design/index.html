@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Concrete Mix Design Studio</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Concrete Mix Design Studio</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Strength, workability, aggregate and durability controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 560" role="img" aria-label="Strength against water cement ratio with the target read off and a draggable operating point, a slump cone, and the mix proportions by volume and by mass"></svg>
+      </div>
+      <div id="tablewrap" class="panel" style="margin-top:14px;overflow-x:auto"></div>
+      <div class="results" id="results"></div>
+      <details class="learn" id="trail"></details>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>The method is ACI 211.1, absolute volume. Water comes from the slump and stone size, the water to cement ratio from the strength, the stone from its packing, and the sand fills whatever volume is left.</li>
+          <li>Strength is set almost entirely by the water to cement ratio. Drag the point along the curve and watch the strength fall as the paste gets wetter, which is Abrams' law.</li>
+          <li>The mix is designed for a mean strength above the characteristic one, because real batches scatter. A larger standard deviation pushes the target up and costs cement.</li>
+          <li>Durability can override strength. An aggressive exposure caps the water to cement ratio and sets a minimum cement content, even when strength alone would allow a leaner mix.</li>
+          <li>Wet aggregate brings its own water. The batch water is cut by the free moisture on the stockpiles so the paste the mixer makes is still the one designed.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Concrete Technology · CE1132 · ACI 211.1 absolute volume method, EN 206 and ACI 318 margins · University of Moratuwa syllabus · Teaches the method, trial mixes still decide</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/design-kit.js"></script>
+<script src="../../assets/js/mix-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
