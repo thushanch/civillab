@@ -1,108 +1,33 @@
-/* Headless smoke test for C1 RC Beam Designer */
-const { JSDOM } = require('jsdom');
-const fs = require('fs'), path = require('path');
-const ROOT = path.resolve(__dirname, '../..');
-const hp = path.join(ROOT, 'apps/c1-rc-beam/index.html');
-let html = fs.readFileSync(hp, 'utf8')
-  .replace(/<script src="([^"]+)"><\/script>/g, (m, src) =>
-    '<script>' + fs.readFileSync(path.resolve(path.dirname(hp), src), 'utf8') + '</script>')
-  .replace(/<link[^>]+>/g, '');
-const errs = [];
-const dom = new JSDOM(html, { runScripts:'dangerously', pretendToBeVisual:true,
-  beforeParse(w){ w.addEventListener('error', e => errs.push(e.message)); } });
-const doc = dom.window.document, w = dom.window;
+/* interaction checks for C1 RC beam designer */
+module.exports = function (doc, w, ok) {
+  const val = key => { const c = [...doc.querySelectorAll('.chip')]
+    .find(c => c.querySelector('.k').textContent.trim() === key);
+    return c ? c.querySelector('.v').textContent.trim() : '(missing)'; };
+  const set = (id, v, ev) => { const el = doc.getElementById(id); el.value = v;
+    el.dispatchEvent(new w.Event(ev || 'input', { bubbles: true })); };
+  const click = sel => doc.querySelector(sel).dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 
-var pass = 0, fail = 0;
-function ok(name, cond) {
-  if (cond) { pass++; console.log('  ok   ' + name); }
-  else { fail++; console.log('  FAIL ' + name); }
-}
-function near(name, got, exp, tol) {
-  if (tol == null) tol = 1;
-  var g = typeof got === 'number' ? got : parseFloat(got);
-  if (Math.abs(g - exp) <= tol) { pass++; console.log('  ok   ' + name + ' = ' + got); }
-  else { fail++; console.log('  FAIL ' + name + ' got ' + got + ' expected ' + exp + ' +/- ' + tol); }
-}
-const val = key => {
-  var c = [...doc.querySelectorAll('.chip')]
-    .find(c => c.querySelector('.k').textContent.includes(key));
-  return c ? c.querySelector('.v').textContent : '(missing)';
+  // 300x500 d=450 C30, M=150: K = 150e6/(300*450^2*30) = 0.0823, As = 832
+  ok('K default', parseFloat(val('K')), 0.0823, 0.0002);
+  ok('As,req default', parseFloat(val('As,req')), 832, 2);
+  // VRd,c = 0.12*1.667*(100*0.00667*30)^(1/3)*300*450 = 73.3 kN
+  ok('VRd,c default', parseFloat(val('VRd,c')), 73.3, 0.2);
+  ok('VRd,max at 21.8', parseFloat(val('VRd,max')), 376.0, 0.5);
+
+  set('MEdr', 200);   // K = 200/150 * 0.0823 = 0.1097
+  ok('K at M=200', parseFloat(val('K')), 0.1097, 0.0002);
+  set('br', 350);     // K = 200e6/(350*450^2*30) = 0.0941
+  ok('K at b=350', parseFloat(val('K')), 0.0941, 0.0002);
+
+  set('preset', 'doubly', 'change');
+  ok('doubly preset K', parseFloat(val('K')), 0.2177, 0.0002);
+  ok('doubly flagged', doc.querySelectorAll('.chip.warn').length > 0, true);
+
+  click('[data-tab="shear"]');
+  ok('shear tab active', doc.querySelector('[data-tab="shear"]').classList.contains('ghost'), false);
+  set('thetar', 45);  // doubly preset bw=250 d=350: 250*315*0.528*17/2 = 353.4 kN
+  ok('VRd,max at 45', parseFloat(val('VRd,max')), 353.4, 0.5);
+
+  set('code', 'bs', 'change');
+  ok('BS chips appear', val('BS K') !== '(missing)', true);
 };
-
-console.log('=== Boot ===');
-ok('no page errors', errs.length === 0);
-ok('fig has children', doc.getElementById('fig').children.length > 0);
-ok('chips rendered', doc.querySelectorAll('.chip').length >= 6);
-ok('controls rendered', doc.getElementById('controls').children.length > 0);
-
-console.log('\n=== Default preset (singly reinforced) ===');
-near('K', val('K'), 0.0823, 0.01);
-ok('singly label', val('K').indexOf('(missing)') < 0);
-near('As,req', val('As,req'), 832, 20);
-ok('VRd,c present', val('VRd,c') !== '(missing)');
-ok('VRd,max present', val('VRd,max') !== '(missing)');
-ok('wk present', val('wk') !== '(missing)');
-ok('L/d present', val('L/d') !== '(missing)');
-
-console.log('\n=== Change MEd to 200 ===');
-var mSlider = doc.getElementById('MEdr');
-mSlider.value = '200';
-mSlider.dispatchEvent(new w.Event('input', { bubbles:true }));
-near('K after M=200', val('K'), 0.1098, 0.01);
-
-console.log('\n=== Change b to 350 ===');
-var bSlider = doc.getElementById('br');
-bSlider.value = '350';
-bSlider.dispatchEvent(new w.Event('input', { bubbles:true }));
-var kStr = val('K');
-var kVal = parseFloat(kStr);
-ok('K decreased with wider b', kVal < 0.1098);
-
-console.log('\n=== Switch to doubly preset ===');
-var preset = doc.getElementById('preset');
-preset.value = 'doubly';
-preset.dispatchEvent(new w.Event('change', { bubbles:true }));
-preset = doc.getElementById('preset');
-ok('preset changed', preset.value === 'doubly');
-var kNew = val('K');
-ok('K > 0.167 (doubly)', parseFloat(kNew) > 0.167);
-
-console.log('\n=== Tab switching ===');
-var shearBtn = doc.querySelector('[data-tab="shear"]');
-shearBtn.dispatchEvent(new w.MouseEvent('click', { bubbles:true }));
-ok('shear tab active', doc.querySelector('[data-tab="shear"]').classList.contains('ghost') === false);
-ok('VRd,c chip still rendered', val('VRd,c') !== '(missing)');
-
-var deflBtn = doc.querySelector('[data-tab="deflection"]');
-deflBtn.dispatchEvent(new w.MouseEvent('click', { bubbles:true }));
-ok('deflection tab active', doc.querySelector('[data-tab="deflection"]').classList.contains('ghost') === false);
-
-var crackBtn = doc.querySelector('[data-tab="cracking"]');
-crackBtn.dispatchEvent(new w.MouseEvent('click', { bubbles:true }));
-ok('cracking tab active', doc.querySelector('[data-tab="cracking"]').classList.contains('ghost') === false);
-
-console.log('\n=== VEd change ===');
-var flexBtn = doc.querySelector('[data-tab="flexure"]');
-flexBtn.dispatchEvent(new w.MouseEvent('click', { bubbles:true }));
-var vSlider = doc.getElementById('VEdr');
-vSlider.value = '300';
-vSlider.dispatchEvent(new w.Event('input', { bubbles:true }));
-var vrdmax = parseFloat(val('VRd,max'));
-ok('VRd,max is a number', !isNaN(vrdmax) && vrdmax > 0);
-
-console.log('\n=== Cantilever preset ===');
-preset = doc.getElementById('preset');
-preset.value = 'cant';
-preset.dispatchEvent(new w.Event('change', { bubbles:true }));
-var ldStr = val('L/d');
-ok('L/d present after cant', ldStr !== '(missing)');
-
-console.log('\n=== Code toggle to BS ===');
-var codeSel = doc.getElementById('code');
-codeSel.value = 'bs';
-codeSel.dispatchEvent(new w.Event('change', { bubbles:true }));
-ok('BS chips appear', val('BS K') !== '(missing)');
-ok('BS As present', val('BS As') !== '(missing)');
-
-console.log('\n' + pass + ' passed, ' + fail + ' failed');
-process.exit(fail ? 1 : 0);

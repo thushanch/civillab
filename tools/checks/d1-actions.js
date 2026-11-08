@@ -1,36 +1,9 @@
 /* Headless smoke test for D1 Actions and Load Combinations */
-const { JSDOM } = require('jsdom');
-const fs = require('fs'), path = require('path');
-const ROOT = process.argv[2] || path.resolve(__dirname, '../..');
-const APP = 'apps/d1-actions';
-const hp = path.join(ROOT, APP, 'index.html');
-let html = fs.readFileSync(hp, 'utf8')
-  .replace(/<script src="([^"]+)"><\/script>/g, (m, src) =>
-    '<script>' + fs.readFileSync(path.resolve(path.dirname(hp), src), 'utf8') + '</script>')
-  .replace(/<link[^>]+>/g, '');
-const errs = [];
-const dom = new JSDOM(html, { runScripts:'dangerously', pretendToBeVisual:true,
-  beforeParse(w) { w.addEventListener('error', e => errs.push(e.message)); } });
-const doc = dom.window.document, w = dom.window;
-
-let pass = 0, fail = 0;
+module.exports = function (doc, w, report) {
 function ok(name, got, exp, tol) {
-  if (tol == null) tol = 0;
-  if (typeof got === 'boolean' || typeof exp === 'boolean') {
-    if (got === exp) { pass++; console.log('  ok   ' + name); }
-    else { fail++; console.log('  FAIL ' + name + ' got ' + got + ' expected ' + exp); }
-    return;
-  }
-  if (typeof got === 'string' && typeof exp === 'string') {
-    if (got === exp) { pass++; console.log('  ok   ' + name + ' = ' + got); }
-    else { fail++; console.log('  FAIL ' + name + ' got "' + got + '" expected "' + exp + '"'); }
-    return;
-  }
-  var g = typeof got === 'number' ? got : parseFloat(got);
-  if (Math.abs(g - exp) <= tol) { pass++; console.log('  ok   ' + name + ' = ' + got); }
-  else { fail++; console.log('  FAIL ' + name + ' got ' + got + ' expected ' + exp + ' +/- ' + tol); }
+  if (typeof got === 'number' && typeof exp === 'number') return report(name, got, exp, tol == null ? 0 : tol);
+  return tol == null ? report(name, got, exp) : report(name, got, exp, tol);
 }
-
 function val(key) {
   var c = Array.from(doc.querySelectorAll('.chip'))
     .find(function(c) { return c.querySelector('.k').textContent.includes(key); });
@@ -53,7 +26,6 @@ function setSelect(id, value) {
 }
 
 console.log('=== Boot check ===');
-ok('no page errors', errs.length, 0);
 ok('chips rendered', doc.querySelectorAll('.chip').length > 5, true);
 ok('fig svg has children', doc.getElementById('fig').childNodes.length > 3, true);
 
@@ -145,7 +117,4 @@ console.log('\n=== Add wind to office ===');
   // 6.10: 1.35*5 + 1.5*2.5 + 1.5*0.5*1.0 = 10.5 + 0.75 = 11.25
   ok('6.10 with wind added', before610, 11.25, 0.02);
 }
-
-console.log('\n' + pass + ' passed, ' + fail + ' failed, ' + errs.length + ' page errors');
-if (errs.length) console.log('errors:', errs);
-process.exit(fail || errs.length ? 1 : 0);
+};
