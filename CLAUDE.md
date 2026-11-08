@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-24 of 37 apps are live. Your job is to build the next app to exactly the
+25 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 24 live cards + pipeline chips
+├── index.html                  landing page, 25 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -78,7 +78,8 @@ civillab/
 │       ├── design-kit.js      DesignKit.bars/chain/trail, shared design UI
 │       ├── rc-beam-engine.js  RCBeamEngine.flexure/shear/deflection/cracking
 │       ├── rc-column-engine.js RCColumnEngine.solve, N-M sweep, slenderness
-│       └── slab-engine.js     SlabEngine.solve/punch, coefficients and punching
+│       ├── slab-engine.js     SlabEngine.solve/punch, coefficients and punching
+│       └── detail-engine.js   DetailEngine.solve, anchorage, cover, spacing
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -86,7 +87,7 @@ civillab/
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
-    c2-rc-column  c3-rc-slab
+    c2-rc-column  c3-rc-slab  c4-detailing
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -464,6 +465,18 @@ SlabEngine.twoWayCoeffs(caseId, ly/lx)   // case 0 is Table 3.13, simply support
 SlabEngine.spacing(AsReq, phi, sMax)     // widest 25 mm step, at least 75 mm
 SlabEngine.betaSy(Nd)                    // BS 8110 eq 19
 SlabEngine.CASES                         // names and discontinuous edges
+
+// detail-engine.js  — mm, MPa, fire period R in minutes
+DetailEngine.solve({ code, member:'beam'|'slab', b, n, s, phi, phiLink, cover, dg,
+  fck, fyk, bond:'good'|'poor', shape:'straight'|'bent', tension, stress,
+  lapped, K, lambda, welded, pressure, exposure, life100, R })
+  // → { sp, cv, an, cd, cBar }   cd = min(clear/2, cover to bar) feeds α2
+DetailEngine.bond({ fck, phi, bond })   // → { fctm, fctk, fctd, eta1, eta2, fbd }
+DetailEngine.anchor(p)   // → { lbrqd, a1..a6, a235, lbmin, lbd, l0, l0min } or BS { fbu, lapF }
+DetailEngine.cover(p)    // → { S, cdur, cminb, cmin, a, cfire, parts[], cnom, gov }
+DetailEngine.spacing(p)  // → { need, clear, ok, nMax, inside }
+DetailEngine.fireAxis(member, R, b)        // EN 1992-1-2 Tables 5.5, 5.8
+DetailEngine.structuralClass(expo, fck, life100, slab)   // Table 4.3N
 ```
 
 ### Writing a new engine
@@ -483,7 +496,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -554,6 +567,13 @@ u0 = min(c2 + 3d, c2 + 2c1), BS perimeter 2(c1 + c2) + 12d at 1.5d.
 RCBeamEngine fixes: span-depth factor (500/fyk)(As,prov/As,req) ≤ 1.5 and
 BS vc = 0.632 at 1 per cent, d 400, fcu 25, with the (fcu/25)^⅓ factor.
 
+Detailing: fctm = 0.30fck^⅔ = 2.90 and fbd = 3.04 MPa at C30, lb,rqd = 715 mm
+or 35.7φ for H20, poor bond 1/0.7 times that, η2 = 0.92 for H40, α2 = 0.85
+at cd = 2φ, α2 α3 α5 held at 0.7, α6 = √(ρ1/25) between 1 and 1.5, BS
+l = φ fs/4fbu = 735 mm with fbu = 0.5√fcu, Table 4.4N 25 mm for XC3 at S4
+giving cnom 35, S3 at C35, S6 for 100 years, fire a = 25 at R60 b 300 and
+80 at R180 b 240, BS moderate cover 35 at C35, clear gap max(φ, dg + 5, 20).
+
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
 with a Re < 1 check.
@@ -562,7 +582,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 24 apps follow.
+One IIFE. This is the shape all 25 apps follow.
 
 ```js
 (() => {
@@ -684,7 +704,7 @@ nothing.
 
 ---
 
-## 9. Remaining 13 apps
+## 9. Remaining 12 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -701,11 +721,8 @@ software. `assets/js/design-kit.js` holds the shared bars, multiplier chains
 and working trail, so every design app from C2 on uses it rather than drawing
 its own. The trail fills a `<details class="learn" id="trail">` element.
 
-**Concrete (3)** EN 1992-1-1 against BS 8110
+**Concrete (2)** EN 1992-1-1 against BS 8110
 
-- `c4-detailing` CE2122. Anchorage and lap lengths with the alpha1 to alpha5
-  chain, cover from exposure class and fire period, bar spacing against the
-  available width.
 - `c5-mix-design` CE1132. Target strength, w/c, grading, workability.
   Document the method used.
 - `c6-prestressed` CE4012. **Reuses SectionEngine.** Transfer and service
@@ -754,7 +771,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "24 live · 13 in the pipeline". Keep cards in build order.
+line, currently "25 live · 12 in the pipeline". Keep cards in build order.
 
 ---
 
