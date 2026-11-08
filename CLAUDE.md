@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-31 of 37 apps are live. Your job is to build the next app to exactly the
+32 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 31 live cards + pipeline chips
+├── index.html                  landing page, 32 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -85,7 +85,8 @@ civillab/
 │       ├── steel-engine.js    SteelEngine.solve, sections, EC3 and BS 5950
 │       ├── conn-engine.js     ConnEngine bolts, welds, base plates
 │       ├── timber-engine.js   TimberEngine.solve, EC5 and BS 5268
-│       └── masonry-engine.js  MasonryEngine vertical, lateral, yield lines
+│       ├── masonry-engine.js  MasonryEngine vertical, lateral, yield lines
+│       └── traffic-engine.js  TrafficEngine.solve, models and shockwaves
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -95,6 +96,7 @@ civillab/
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
     c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design  c6-prestressed
     st1-member-capacity  st2-connections  t1-timber  m1-masonry
+    tr1-traffic-flow
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -561,6 +563,14 @@ MasonryEngine.fk(unit, fb, fm)          // K fb^0.7 fm^0.3
 MasonryEngine.hef(h, L, rho2, sides)    // rho2, rho3, rho4
 MasonryEngine.phiG(SR, fk, emk, t)      // Annex G
 MasonryEngine.yieldLine(L, h, mu)       // affinity, alpha2 = 1/24 for a square, mu 1
+
+// traffic-engine.js  — k veh/km, v km/h, q veh/h
+TrafficEngine.solve({ model:'greenshields'|'greenberg'|'underwood', vf, kj, kA, kB })
+  // → { m:{v(k), q(k), kc, qmax, vc, kOfV(v)}, A, B, uw }
+  //   each state { k, v, q, headway, spacing, regime, vc }
+TrafficEngine.model(type, vf, kj)
+TrafficEngine.densitiesForFlow(vf, kj, q)   // Greenshields, both roots
+TrafficEngine.shock(A, B)                   // (qB - qA)/(kB - kA)
 ```
 
 ### Writing a new engine
@@ -580,7 +590,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 + 47 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 + 47 + 33 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -701,15 +711,20 @@ t[(hef/tef)²/2400 − 0.015] and β = 1.1(1 − 2em/t) held at zero, yield line
 α2 = 1/24 for a square isotropic panel tending to the one way values 8m1/h²
 and 8m2/L², precompression added to fxd1, arching qlat = 8Nad(0.9t)/h².
 
+Traffic: Greenshields qmax = vf kj/4 = 3750 veh/h at k = kj/2 and v = vf/2
+for 100 km/h and 150 veh/km, Greenberg qmax = vm kj/e at kj/e, Underwood
+qmax = vf ko/e, each confirmed by a numerical search, the two densities
+for one flow summing to kj, and the shock speed (qB − qA)/(kB − kA) equal to
+vf(1 − (kA + kB)/kj) under Greenshields.
+
 For engines still to be written:
-Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
-with a Re < 1 check.
+Stokes vs = g(ρs − ρ)d²/18μ with a Re < 1 check.
 
 ---
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 31 apps follow.
+One IIFE. This is the shape all 32 apps follow.
 
 ```js
 (() => {
@@ -831,7 +846,7 @@ nothing.
 
 ---
 
-## 9. Remaining 6 apps
+## 9. Remaining 5 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -858,10 +873,8 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 
 
 
-**Transportation (3)**
+**Transportation (2)**
 
-- `tr1-traffic-flow` CE3162. Greenshields, three linked plots v-k, q-k, v-q
-  with one synchronised draggable operating point. qmax = vf·kj/4.
 - `tr2-alignment` CE3162 and CE4042. Horizontal curve in plan and vertical
   curve in profile, SSD drawn and checked.
 - `tr3-pavement` CE4042. Layered section, stress decay with depth, subgrade
@@ -880,7 +893,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "31 live · 6 in the pipeline". Keep cards in build order.
+line, currently "32 live · 5 in the pipeline". Keep cards in build order.
 
 ---
 

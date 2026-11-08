@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Traffic Flow Fundamental Diagram</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Traffic Flow Fundamental Diagram</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Traffic model, free flow speed, jam density and operating state controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 600" role="img" aria-label="Speed against density, flow against density and speed against flow with one operating point dragged across all three, and the traffic on the road"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>The three plots are one relationship seen three ways, because flow is always density times speed. Drag the point on any of them and it moves on the other two.</li>
+          <li>Flow rises as cars join the road, peaks at capacity, then falls as they get in each other's way. Under Greenshields the peak sits at half the jam density and half the free flow speed.</li>
+          <li>Every flow below capacity can happen two ways, light and fast or dense and slow. The right half of the flow curve is congestion, and the road carries less there, not more.</li>
+          <li>When two traffic states meet, the boundary between them moves at the slope of the chord joining them on the flow curve. A negative slope sends the queue tail backwards up the road.</li>
+          <li>Greenberg suits dense traffic and Underwood light traffic. Comparing the three shows how much the capacity depends on the model chosen.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Transportation · CE3162 · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/traffic-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
