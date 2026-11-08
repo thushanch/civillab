@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Masonry Wall Design</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Masonry Wall Design</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Unit, mortar, wall geometry, restraint and load controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 560" role="img" aria-label="Wall section with its effective height and eccentricity and the capacity reduction curves, or the wall panel with its yield line pattern under lateral load"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn" id="trail"></details>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Masonry is strong in compression and weak everywhere else. A load that sits off centre bends the wall, and the reduction factor Φ takes away the part of the strength that the bending uses up.</li>
+          <li>A tall thin wall bows at mid height, so the eccentricity grows there. That is why Φ at mid height usually governs and why EC6 caps hef/tef at 27.</li>
+          <li>Concrete floors bearing on the wall hold its top and bottom, so the effective height drops to 0.75h. Returns or piers at the ends shorten it again.</li>
+          <li>Under wind a panel supported on four edges cracks along yield lines from its corners. It is stronger spanning across the bed joints than along them, and the orthogonal ratio μ decides the shape of the cracks.</li>
+          <li>Wedge the same wall tightly between rigid supports and it carries lateral load as an arch instead of in bending, often several times more.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Masonry · CE3122 · EN 1996-1-1 / BS 5628-1 · University of Moratuwa syllabus · Teaches the checks, not design software</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/design-kit.js"></script>
+<script src="../../assets/js/masonry-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
