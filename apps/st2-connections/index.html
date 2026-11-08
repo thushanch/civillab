@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Steel Connection Designer</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Steel Connection Designer</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Bolt group, weld or base plate controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 560" role="img" aria-label="A bolt group with the force on every bolt and the block tearing path, a welded bracket with the weld force at its worst point, or a column base plate with its effective bearing area"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn" id="trail"></details>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>An eccentric load makes the bolt group rotate about its centroid. Every bolt then carries a share of the direct load plus a force at right angles to its radius, and the bolt furthest from the centroid works hardest.</li>
+          <li>A bolt can fail by shearing through, by crushing the plate behind it in bearing, or by tearing out a whole block of plate along the line of holes. The worst of these governs.</li>
+          <li>A bolted end plate in tension bends like a T. A thin plate yields in a double curvature with prying at its edges, a thick plate lets the bolts fail first. That is mode 1 against mode 3.</li>
+          <li>A fillet weld is about 22 per cent stronger loaded across its length than along it. The directional method uses the real angle at the worst point of the weld.</li>
+          <li>A base plate spreads the column load onto weaker concrete. Only a strip c wide around the steel profile really bears, and c grows with the plate thickness.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Steel · CE2022 · EN 1993-1-8 / BS 5950-1 · University of Moratuwa syllabus · Teaches the checks, not design software</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/design-kit.js"></script>
+<script src="../../assets/js/steel-engine.js"></script>
+<script src="../../assets/js/conn-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

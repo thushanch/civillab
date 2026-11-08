@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-28 of 37 apps are live. Your job is to build the next app to exactly the
+29 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 28 live cards + pipeline chips
+├── index.html                  landing page, 29 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -82,7 +82,8 @@ civillab/
 │       ├── detail-engine.js   DetailEngine.solve, anchorage, cover, spacing
 │       ├── mix-engine.js      MixEngine.solve, ACI 211.1 absolute volume
 │       ├── prestress-engine.js PrestressEngine.solve, losses and Magnel
-│       └── steel-engine.js    SteelEngine.solve, sections, EC3 and BS 5950
+│       ├── steel-engine.js    SteelEngine.solve, sections, EC3 and BS 5950
+│       └── conn-engine.js     ConnEngine bolts, welds, base plates
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -91,7 +92,7 @@ civillab/
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
     c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design  c6-prestressed
-    st1-member-capacity
+    st1-member-capacity  st2-connections
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -521,6 +522,20 @@ SteelEngine.classify(s, fy, N)     // Table 5.2 with alpha and psi for the web
 SteelEngine.chi(lambda, curve)     // Table 6.2, curves a0 to d
 SteelEngine.perry(py, lambda, a)   // BS 5950 Annex C strut curve
 SteelEngine.shape(kind, psi)       // C1, kc, Cm, mLT, mx
+
+// conn-engine.js  — mm, MPa, kN, kN·m, gamma_M0 1.0, gamma_M2 1.25, uses SteelEngine
+ConnEngine.boltGroup({ code, nr, nc, p, g, e1, e2, t, steel, d, grade, planes,
+  V, ecc, N, tp, mT, nT, leff, boltsT })
+  // EC3 → { pg:{bolts,n,Ip,M,crit,Fmax}, FvRd, ad, ab, k1, FbRd, FtRd, Ant, Anv, Veff,
+  //         Mpl, FT1, FT2, FT3, FT, mode, u:{shear,bearing,tension,combined,block,tstub} }
+  // BS  → { pg, Ps, Pbb, Pbs, Pnom, Pr, u }
+ConnEngine.polar(nr, nc, p, g, V, ecc)   // elastic bolt group analysis
+ConnEngine.weld({ code, steel, s, L, b, V, ecc })
+  // → { a, Ip, wx, wy, w, theta, Rd, K, simple, util, utilSimple }
+ConnEngine.weldPerMm(code, steel, a, theta)   // directional, K = 1.225 transverse
+ConnEngine.basePlate({ code, colIdx, B, D, tp, steel, fck, padRatio, NEd })
+  // → { col, fjd, c, Aeff, NjRd, tpReq, util }
+ConnEngine.BOLTS, .GRADES, .STEEL, .holeD(d)
 ```
 
 ### Writing a new engine
@@ -540,7 +555,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -640,6 +655,13 @@ a to d, Mcr about 240 kNm at 6 m under uniform moment and 1.127 times that
 for a UDL, χLT on curve c because h/b > 2, BS pc = 142.7 (Table 24b) and
 159.8 (24a) at λ 100, pb = 126 at λLT 100 (Table 16), Nu,Rd = 0.9Anet fu/1.25.
 
+Connections: M20 8.8 Fv,Rd = 94.1 and Ft,Rd = 141.1 kN, bearing 99.4 kN at
+e1 = e2 = 40 in 10 mm S275, αv = 0.5 for 10.9, the polar method balancing
+force and moment exactly with Σr² = 25 000 mm² for a 3×2 group, block
+tearing with the eccentric half tension term, T-stub modes 4Mpl/m,
+(2Mpl + nΣFt)/(m + n) and ΣFt, an 8 mm S275 fillet at 1.25 kN/mm and 1.225
+times that transverse, BS K = 1.25, fjd = (2/3)fcd√(Ac1/Ac0), c = tp√(fy/3fjd).
+
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
 with a Re < 1 check.
@@ -648,7 +670,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 28 apps follow.
+One IIFE. This is the shape all 29 apps follow.
 
 ```js
 (() => {
@@ -770,7 +792,7 @@ nothing.
 
 ---
 
-## 9. Remaining 9 apps
+## 9. Remaining 8 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -790,11 +812,8 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 **Concrete (0)** EN 1992-1-1 against BS 8110
 
 
-**Steel (1)** EN 1993-1-1 against BS 5950
+**Steel (0)** EN 1993-1-1 against BS 5950
 
-- `st2-connections` CE2022. Tabs for the bolt group, welds and the base plate.
-  Bolt shear, bearing on both plies, tension with prying, block tear drawn on
-  the plate, fillet welds by the directional method, base plate effective area.
 
 **Timber and masonry (2)**
 
@@ -828,7 +847,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "28 live · 9 in the pipeline". Keep cards in build order.
+line, currently "29 live · 8 in the pipeline". Keep cards in build order.
 
 ---
 
