@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-33 of 37 apps are live. Your job is to build the next app to exactly the
+34 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 33 live cards + pipeline chips
+├── index.html                  landing page, 34 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -87,7 +87,8 @@ civillab/
 │       ├── timber-engine.js   TimberEngine.solve, EC5 and BS 5268
 │       ├── masonry-engine.js  MasonryEngine vertical, lateral, yield lines
 │       ├── traffic-engine.js  TrafficEngine.solve, models and shockwaves
-│       └── alignment-engine.js AlignmentEngine SSD, radius, sight, vertical
+│       ├── alignment-engine.js AlignmentEngine SSD, radius, sight, vertical
+│       └── pavement-engine.js PavementEngine CBR, Odemark, rutting
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -97,7 +98,7 @@ civillab/
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
     c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design  c6-prestressed
     st1-member-capacity  st2-connections  t1-timber  m1-masonry
-    tr1-traffic-flow  tr2-alignment
+    tr1-traffic-flow  tr2-alignment  tr3-pavement
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -580,6 +581,14 @@ AlignmentEngine.solve({ V, t, a, G, e, fAuto, f, R, delta, M, g1, g2, L })
 AlignmentEngine.ssd(V, t, a, G), .rmin(V, e, f), .fmax(V)
 AlignmentEngine.hso(R, S, Lc), .sightFromOffset(R, M, Lc)
 AlignmentEngine.crestL(A, S), .sagL(A, S), .crestS(A, L), .sagS(A, L)
+
+// pavement-engine.js  — mm, MPa, kN, kPa, traffic in msa
+PavementEngine.solve({ h1, E1, h2, E2, cbrBase, h3, E3, cbrSub, CBR, P, p, N })
+  // → { layers, Es, a, C, total, needSub, needOverSub, needOverBase, he, eps, Nd,
+  //     sigSub, profile:[{d, ratio}], u:{total, overSub, overBase, rut} }
+PavementEngine.cbrThickness(P, p, CBR, C)   // Corps of Engineers, mm
+PavementEngine.equivDepth(layers, Es, d)     // Odemark, 0.9 sum h (E/Es)^1/3
+PavementEngine.sigmaRatio(z, a), .strainZ(z, a, p, E), .Nrut(eps)
 ```
 
 ### Writing a new engine
@@ -599,7 +608,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 + 47 + 33 + 32 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 + 47 + 33 + 32 + 28 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -732,6 +741,11 @@ cos(S/2R)) close to S²/8R with the long form joining at S = Lc, crest L =
 AS²/658 giving K 50.9 (table 52), sag L = AS²/(120 + 3.5S) giving K 44.0
 (table 45), the S > L forms, and each L to S inversion round tripping.
 
+Pavement: a = √(P/πp) = 152 mm for 40 kN at 550 kPa, Boussinesq σz/p =
+0.646 at z = a, Odemark depth 1037 mm for 100/200/250 mm over CBR 5, the
+Corps CBR cover 347 mm at 5000 repetitions over CBR 5, Asphalt Institute
+Nd = 1.365×10⁻⁹ εz^−4.477 so halving the strain multiplies the life by 22.
+
 For engines still to be written:
 Stokes vs = g(ρs − ρ)d²/18μ with a Re < 1 check.
 
@@ -739,7 +753,7 @@ Stokes vs = g(ρs − ρ)d²/18μ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 33 apps follow.
+One IIFE. This is the shape all 34 apps follow.
 
 ```js
 (() => {
@@ -861,7 +875,7 @@ nothing.
 
 ---
 
-## 9. Remaining 4 apps
+## 9. Remaining 3 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -888,10 +902,8 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 
 
 
-**Transportation (1)**
+**Transportation (0)**
 
-- `tr3-pavement` CE4042. Layered section, stress decay with depth, subgrade
-  CBR driving thickness, strain check bar.
 
 **Environmental (3)**
 
@@ -906,7 +918,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "33 live · 4 in the pipeline". Keep cards in build order.
+line, currently "34 live · 3 in the pipeline". Keep cards in build order.
 
 ---
 

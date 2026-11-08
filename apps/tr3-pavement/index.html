@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · Pavement Design</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>Pavement Design</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Layer thickness and modulus, subgrade CBR, wheel load and traffic controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 560" role="img" aria-label="The layered pavement under a wheel load beside the vertical stress falling with depth, with the CBR thickness needed and the subgrade strain check"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn" id="trail"></details>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>The tyre presses on a small circle, and the stress spreads out and falls with depth. By the time it reaches the soil it must be small enough for the soil to carry it for millions of axles.</li>
+          <li>Stiff layers spread the load fastest. Odemark turns each layer into an equivalent depth of soil, a stiff asphalt layer counting several times its real thickness.</li>
+          <li>The CBR of the subgrade drives the whole design. Halve it and the thickness needed jumps, because the weakest material sets how much cover it needs.</li>
+          <li>Each layer needs enough stronger material above it. That is why the CBR method is applied over the subgrade and again over the subbase.</li>
+          <li>The mechanistic check limits the vertical strain at the top of the subgrade, which controls rutting. Halving the strain multiplies the life by about 22.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Highway Engineering · CE4042 / CE4532 · Corps of Engineers CBR method, Odemark and Asphalt Institute · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/design-kit.js"></script>
+<script src="../../assets/js/pavement-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
