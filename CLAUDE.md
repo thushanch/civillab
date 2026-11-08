@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-36 of 37 apps are live. Your job is to build the next app to exactly the
+37 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 36 live cards + pipeline chips
+├── index.html                  landing page, 37 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -90,7 +90,8 @@ civillab/
 │       ├── alignment-engine.js AlignmentEngine SSD, radius, sight, vertical
 │       ├── pavement-engine.js PavementEngine CBR, Odemark, rutting
 │       ├── treatment-engine.js TreatmentEngine, stage by stage removals
-│       └── settling-engine.js SettlingEngine Stokes, drag, ideal tank
+│       ├── settling-engine.js SettlingEngine Stokes, drag, ideal tank
+│       └── dosag-engine.js    DOSagEngine Streeter-Phelps
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -101,7 +102,7 @@ civillab/
     c2-rc-column  c3-rc-slab  c4-detailing  c5-mix-design  c6-prestressed
     st1-member-capacity  st2-connections  t1-timber  m1-masonry
     tr1-traffic-flow  tr2-alignment  tr3-pavement  en1-treatment-train
-    en2-sedimentation
+    en2-sedimentation  en3-do-sag
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -606,6 +607,11 @@ SettlingEngine.solve({ d, rhos, T, Q, L, W, H })
 SettlingEngine.settle(dmm, rhos, T)   // Stokes, transitional drag past Re 1
 SettlingEngine.tank({ Q, L, W, H }), .removal(vs, vo), .scour(dmm, rhos, rw)
 SettlingEngine.rhoW(T), .muW(T)       // Tanaka and Vogel
+
+// dosag-engine.js  — m3/s, mg/L, deg C, per day, m/s, m, km
+DOSagEngine.solve({ Qw, Lw, DOw, Tw, Qr, Lr, DOr, Tr, bod5, kd20, kr20, od, u, H, std })
+  // → { m:{Q,Lw,Lr,L0,DO0,T}, sat, D0, kd, kr, tc, Dc, DOmin, xc, allow, curve, u:{DO,load} }
+DOSagEngine.deficit(t, kd, kr, L0, D0), .critical(kd, kr, L0, D0), .dosat(T), .oconnor(u, H)
 ```
 
 ### Writing a new engine
@@ -625,7 +631,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 + 47 + 33 + 32 + 28 + 30 + 29 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 + 73 + 43 + 50 + 79 + 55 + 45 + 47 + 33 + 32 + 28 + 30 + 29 + 32 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -774,14 +780,15 @@ vs scaling with d², 1 mm sand self consistent with Cd = 24/Re + 3/√Re +
 0.34 at about 0.15 m/s, overflow rate Q/LW independent of depth, removal
 min(1, vs/vo), and the critical diameter carrying exactly vs = vo.
 
-For engines still to be written:
-Streeter-Phelps critical time tc and deficit Dc from their closed forms.
+DO sag: DOsat 9.09, 8.26 and 14.62 mg/L at 20, 25 and 0 °C, D(0) = D0, Dc = D(tc)
+with zero slope there, the kr = kd limits, worst point at the outfall when tc < 0,
+O'Connor-Dobbins 3.93u^0.5/H^1.5, and the allowed load meeting the standard exactly.
 
 ---
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 36 apps follow.
+One IIFE. This is the shape all 37 apps follow.
 
 ```js
 (() => {
@@ -903,7 +910,7 @@ nothing.
 
 ---
 
-## 9. Remaining 1 apps
+## 9. Remaining 0 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -933,16 +940,15 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 **Transportation (0)**
 
 
-**Environmental (1)**
+**Environmental (0)**
 
-- `en3-do-sag` CE4552. Streeter-Phelps curve, critical point and minimum DO.
 
 ### Landing page maintenance when an app ships
 
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "36 live · 1 in the pipeline". Keep cards in build order.
+line, currently "37 live · 0 in the pipeline". Keep cards in build order.
 
 ---
 

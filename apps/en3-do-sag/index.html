@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · DO Sag Curve</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>DO Sag Curve</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Waste discharge, river and rate controls"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 520" role="img" aria-label="Dissolved oxygen along the river below an outfall with the critical point, the saturation level, the standard and the BOD remaining"></svg>
+      </div>
+      <div class="results" id="results"></div>
+      <details class="learn" id="trail"></details>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>Below an outfall bacteria eat the waste and use up oxygen, while the surface puts oxygen back. The sag is the race between the two.</li>
+          <li>At first deoxygenation wins and the oxygen falls. At the critical point the two rates are equal, and after it the river slowly recovers.</li>
+          <li>A fast, shallow river reaerates quickly, so the same load sags far less than in a slow, deep one.</li>
+          <li>Warm water holds less oxygen and speeds up the bacteria, so the worst sags come in the dry, hot season at low flow.</li>
+          <li>The allowed load is the largest waste BOD that keeps the minimum oxygen at the standard. It shows why treatment before discharge matters.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Environmental Engineering · CE4552 / CE3152 · Streeter-Phelps · University of Moratuwa syllabus</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/design-kit.js"></script>
+<script src="../../assets/js/dosag-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
