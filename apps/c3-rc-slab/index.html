@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilLab · RC Slab Designer</title>
+<link rel="icon" href="../../assets/img/markB.png">
+<link rel="stylesheet" href="../../assets/css/civillab.css">
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <img class="mark" src="../../assets/img/markB.png" alt="">
+    <div class="titles">
+      <div class="suite">CivilLab <span>· Study Aid</span></div>
+      <h1>RC Slab Designer</h1>
+    </div>
+    <a class="back" href="../../index.html">All apps</a>
+  </header>
+
+  <svg class="contour" viewBox="0 0 1180 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 15 C 60 6, 120 24, 180 13 S 300 4, 360 15 S 480 24, 540 11
+             S 660 4, 720 15 S 840 24, 900 11 S 1020 6, 1080 15 S 1150 21, 1180 11"
+          fill="none" stroke="#C9CEC7" stroke-width="1.5"/>
+  </svg>
+
+  <div class="workbench">
+    <aside class="panel" id="controls" aria-label="Slab panel, loads, materials and punching column"></aside>
+    <div>
+      <div class="figwrap">
+        <svg id="fig" viewBox="0 0 960 560" role="img" aria-label="Slab panel in plan with moment coefficients and bars on each strip, or the punching control perimeters around a column"></svg>
+      </div>
+      <div id="tablewrap" class="panel" style="margin-top:14px;overflow-x:auto"></div>
+      <div class="results" id="results"></div>
+      <details class="learn" id="trail"></details>
+      <details class="learn">
+        <summary>What am I seeing?</summary>
+        <ul>
+          <li>A one way slab bends like a wide beam. Once the long side passes twice the short side, a two way panel behaves the same way, because the short direction is far stiffer.</li>
+          <li>In a two way panel both directions carry load. The short span takes the larger share, so its bars sit in the outer layer where the lever arm is longest.</li>
+          <li>Continuous edges attract hogging moment and need top steel. A discontinuous edge releases that moment back into the span, which is why corner panels get the biggest coefficients.</li>
+          <li>Punching is a cone of concrete pushed through the slab by the column. The check is made on a perimeter at 2d in EN 1992-1-1, with rounded corners, and at 1.5d with square corners in BS 8110.</li>
+          <li>Edge and corner columns lose part of their perimeter and carry an unbalanced moment, so β grows from 1.15 to 1.4 and 1.5.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <span class="note">CivilLab · Concrete · CE2122 · EN 1992-1-1 / BS 8110 · University of Moratuwa syllabus · Teaches the checks, not design software</span>
+    <img src="../../assets/img/wm_horizontal_dark.png" alt="Thushan Chamika">
+  </footer>
+</div>
+<script src="../../assets/js/ui.js"></script>
+<script src="../../assets/js/design-kit.js"></script>
+<script src="../../assets/js/rc-beam-engine.js"></script>
+<script src="../../assets/js/slab-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

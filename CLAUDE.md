@@ -7,7 +7,7 @@ You are continuing **CivilLab**, an interactive civil engineering simulator
 suite by Thushan Chamika, built on the University of Moratuwa Civil
 Engineering Student Handbook 2022. Companion suite to Water Lab.
 
-23 of 37 apps are live. Your job is to build the next app to exactly the
+24 of 37 apps are live. Your job is to build the next app to exactly the
 same standard, or fix an existing one. Read this whole file before writing
 any code.
 
@@ -51,7 +51,7 @@ Definition of done for a new app:
 
 ```
 civillab/
-├── index.html                  landing page, 23 live cards + pipeline chips
+├── index.html                  landing page, 24 live cards + pipeline chips
 ├── README.md
 ├── PLAN.md                     full prose roadmap for all 37 apps
 ├── assets/
@@ -77,7 +77,8 @@ civillab/
 │       ├── actions-engine.js  ActionsEngine.solve, EN 1990 combinations
 │       ├── design-kit.js      DesignKit.bars/chain/trail, shared design UI
 │       ├── rc-beam-engine.js  RCBeamEngine.flexure/shear/deflection/cracking
-│       └── rc-column-engine.js RCColumnEngine.solve, N-M sweep, slenderness
+│       ├── rc-column-engine.js RCColumnEngine.solve, N-M sweep, slenderness
+│       └── slab-engine.js     SlabEngine.solve/punch, coefficients and punching
 └── apps/
     s1-beam-studio  s2-mohrs-circle  s3-bending-stress  s4-shear-stress
     s5-torsion      s6-deflection    s7-buckling        s8-truss
@@ -85,7 +86,7 @@ civillab/
     s11-plastic-collapse  s12-dynamics  g1-soil-phase  g2-classification
     g3-shear-strength  g4-flow-nets  g5-consolidation  g6-slope-stability
     f1-earth-pressure  f2-bearing-capacity  d1-actions  c1-rc-beam
-    c2-rc-column
+    c2-rc-column  c3-rc-slab
 ```
 
 Every app folder holds exactly `index.html` + `app.js`. No per-app CSS.
@@ -448,6 +449,21 @@ DesignKit.chain(svg, { x, y, w, h, title, clause }, [{ op, sym, val }])
 DesignKit.trail(detailsEl, 'Show the working', [{ t: html, c: clause }])
 DesignKit.verdict(items)   // → [ 'Passes'|'Fails', sub, cls ] for a chip
 DesignKit.governing(items)
+
+// slab-engine.js  — mm, m spans, kN/m2, kN·m per metre, uses RCBeamEngine
+//   coefficients from BS 8110 Tables 3.12 to 3.14, shared by both codes
+SlabEngine.solve({ code, type:'one'|'two', support:'ss'|'cont', caseId:0..9,
+  lx, ly, h, cover, phi, fck, fyk, gsup, qk })   // gk adds 25h self weight
+  // → { n, gk, L:{gG,gQ,n}, dx, dy, sMain, sSec, ratio, coeffs,
+  //     strips:[{key,name,coef,M,d,K,z,AsReq,AsMin,AsUse,s,AsProv,sag,dir}],
+  //     worst, dfl, shear }
+SlabEngine.punch({ code, pos:'int'|'edge'|'corner', c1, c2, d, VEd, fck, fyk, rhoL })
+  // → { beta, u0, u1, r1, v0, vmax, v1, vc, needLinks, uout, rout, AswSr,
+  //     face, basic, maxLinks, shape:'round'|'square' }
+SlabEngine.twoWayCoeffs(caseId, ly/lx)   // case 0 is Table 3.13, simply supported
+SlabEngine.spacing(AsReq, phi, sMax)     // widest 25 mm step, at least 75 mm
+SlabEngine.betaSy(Nd)                    // BS 8110 eq 19
+SlabEngine.CASES                         // names and discontinuous edges
 ```
 
 ### Writing a new engine
@@ -467,7 +483,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined')
 
 ### Anchor values for tests
 
-Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 61 + 92 checks):
+Already used and passing (45 + 38 + 106 + 70 + 38 + 80 + 55 + 107 + 91 + 74 + 70 + 92 + 91 checks):
 PL/4, wL²/8, PL³/48EI, 5wL⁴/384EI, PL³/3EI, τmax = 1.5V/A rectangle and
 4/3V/A circle, τ = 16T/πd³, Euler k = 1 / 0.5 / 0.6992 / 2, Se = wGs,
 ∓wL²/12 fixed end moments, −wL²/8 propped, 8Mp/L, 16Mp/L², hinge at
@@ -527,6 +543,17 @@ by a hand quadratic to x = 65.7 mm and M = 170.3 kNm, λ = l0√12/h = 46.19,
 Kφ = 1.192, e2 = 27.1 mm, BS Nuz = 0.45fcu(Ac − As) + 0.87fyAsc,
 βa = (le/b)²/2000, biaxial a = 1, 1.25, 1.5, 2 at NEd/NRd 0.1, 0.4, 0.7, 1.0.
 
+RC slab: n = 1.35gk + 1.5qk = 11.25 and BS 1.4gk + 1.6qk = 11.8 for 5 and 3,
+Table 3.14 interior 0.031 and 0.024 at ly/lx 1, 0.044 and 0.0335 at 1.25,
+every long span coefficient matching BS eq 19 (24 + 2Nd + 1.5Nd²)/1000,
+Table 3.13 giving 1/16 for a square panel and 0.104 and 0.046 at 1.5,
+Table 3.12 0.086FL, 0.063FL and 0.6F shear, H10 at 175 for 400 mm²/m,
+EC2 punching u1 = 2(c1 + c2) + 4πd, vRd,c = 0.746 and vEd,1 = 0.699 MPa for
+400 square, d 200, 500 kN, rout = 604 mm and Asw/sr = 3.83 at 700 kN, edge
+u0 = min(c2 + 3d, c2 + 2c1), BS perimeter 2(c1 + c2) + 12d at 1.5d.
+RCBeamEngine fixes: span-depth factor (500/fyk)(As,prov/As,req) ≤ 1.5 and
+BS vc = 0.632 at 1 per cent, d 400, fcu 25, with the (fcu/25)^⅓ factor.
+
 For engines still to be written:
 Greenshields qmax = vf·kj/4 at k = kj/2; Stokes vs = g(ρs − ρ)d²/18μ
 with a Re < 1 check.
@@ -535,7 +562,7 @@ with a Re < 1 check.
 
 ## 7. app.js pattern
 
-One IIFE. This is the shape all 23 apps follow.
+One IIFE. This is the shape all 24 apps follow.
 
 ```js
 (() => {
@@ -657,7 +684,7 @@ nothing.
 
 ---
 
-## 9. Remaining 14 apps
+## 9. Remaining 13 apps
 
 Build order: design modules, then transport and environmental.
 Full prose specs are in `PLAN.md`.
@@ -674,10 +701,8 @@ software. `assets/js/design-kit.js` holds the shared bars, multiplier chains
 and working trail, so every design app from C2 on uses it rather than drawing
 its own. The trail fills a `<details class="learn" id="trail">` element.
 
-**Concrete (4)** EN 1992-1-1 against BS 8110
+**Concrete (3)** EN 1992-1-1 against BS 8110
 
-- `c3-rc-slab` CE2122. One way and two way panels, moment coefficients on each
-  strip, punching shear with the control perimeters drawn at 2d.
 - `c4-detailing` CE2122. Anchorage and lap lengths with the alpha1 to alpha5
   chain, cover from exposure class and fire period, bar spacing against the
   available width.
@@ -729,7 +754,7 @@ its own. The trail fills a `<details class="learn" id="trail">` element.
 Remove its `.pchip` from the pipeline group (and drop the group if it
 empties), add a `.card` under "Live now" with discipline plus module code in
 `.disc`, two or three sentences, and an Open button. Update the hero count
-line, currently "23 live · 14 in the pipeline". Keep cards in build order.
+line, currently "24 live · 13 in the pipeline". Keep cards in build order.
 
 ---
 
